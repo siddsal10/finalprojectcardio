@@ -1,0 +1,13 @@
+{
+  "client": "C",
+  "arch": "bilstm",
+  "folds": [
+    5,
+    6
+  ],
+  "n_train": 4264,
+  "n_params": 673285,
+  "temperature": 1.1261667013168335,
+  "best_val_macro_auroc": 0.901012658780086,
+  "epochs_run": 34
+}

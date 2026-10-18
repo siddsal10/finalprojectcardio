@@ -1,0 +1,13 @@
+{
+  "client": "A",
+  "arch": "cnn1d",
+  "folds": [
+    1,
+    2
+  ],
+  "n_train": 4277,
+  "n_params": 437317,
+  "temperature": 1.9897565841674805,
+  "best_val_macro_auroc": 0.8937931143839137,
+  "epochs_run": 21
+}

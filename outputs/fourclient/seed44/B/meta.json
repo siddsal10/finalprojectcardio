@@ -1,0 +1,13 @@
+{
+  "client": "B",
+  "arch": "resnet1d",
+  "folds": [
+    3,
+    4
+  ],
+  "n_train": 4280,
+  "n_params": 6729349,
+  "temperature": 1.7284883260726929,
+  "best_val_macro_auroc": 0.8855468241489781,
+  "epochs_run": 26
+}

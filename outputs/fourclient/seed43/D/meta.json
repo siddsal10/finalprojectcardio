@@ -1,0 +1,13 @@
+{
+  "client": "D",
+  "arch": "cnn_lstm",
+  "folds": [
+    7,
+    8
+  ],
+  "n_train": 4263,
+  "n_params": 471621,
+  "temperature": 1.3109499216079712,
+  "best_val_macro_auroc": 0.8972134549640449,
+  "epochs_run": 28
+}
