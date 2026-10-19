@@ -1,6 +1,7 @@
 data/raw/
 data/processed/
 outputs/fourclient/debug/
+web/data/
 .venv/
 __pycache__/
 *.pyc
