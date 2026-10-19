@@ -11,4 +11,6 @@ echo "[$(date '+%F %T')] start aggregate"
 $PY -m cardiomoe.fourclient.aggregate --seeds $SEEDS
 echo "[$(date '+%F %T')] start evaluate"
 $PY -m cardiomoe.fourclient.evaluate --seeds $SEEDS
+echo "[$(date '+%F %T')] start triage"
+$PY -m cardiomoe.fourclient.triage --seeds $SEEDS
 echo "[$(date '+%F %T')] done"

@@ -79,3 +79,25 @@ def test_full_report_perfect():
     r = full_report(y, y * 0.9 + 0.05, np.full(5, 0.5))
     assert r["summary"]["exact_match_accuracy"] == 1.0
     assert r["summary"]["macro_f1"] == 1.0
+
+
+
+def test_triage_bands_meet_targets_and_modes():
+    from cardiomoe.fourclient.triage import INDETERMINATE, Triage, fit_triage
+
+    rng = np.random.default_rng(0)
+    n = 2000
+    y = (rng.random((n, 5)) < 0.3).astype(float)
+    strength = np.array([4.0, 3.0, 2.5, 3.0, 0.3])  # last class barely separable
+    p = 1 / (1 + np.exp(-((2 * y - 1) * strength + rng.normal(0, 1.5, (n, 5)))))
+    tcfg = {"targets": {"precision": 0.9, "recall": 0.9, "accuracy": 0.9}, "margin": 0.0,
+            "min_positive_auto": 0.1, "rule_out": {"min_npv": 0.95, "max_missed": 0.05}, "grid": 101}
+    tri = fit_triage(y, p, tcfg)
+    pc = tri["fold9_cv"]["per_class"]
+    assert pc["NORM"]["mode"] == "automated" and pc["HYP"]["mode"] != "automated"
+    for c in tri["fold9_cv"]["summary"]["automated_classes"]:
+        assert pc[c]["precision"] >= 0.9 and pc[c]["recall"] >= 0.9 and pc[c]["positive_auto"] >= 0.1
+        assert 0 < pc[c]["coverage"] < 1
+    d = Triage.from_dict(tri).decide(p)
+    assert set(np.unique(d)) <= {INDETERMINATE, 0, 1}
+    assert (d[:, 4] != 1).all()  # a non-automated class never auto-reports a positive

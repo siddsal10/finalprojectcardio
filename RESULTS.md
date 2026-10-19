@@ -253,3 +253,71 @@ Mean of 3 seeds; SDs ≤ 0.003 (see `client_subsets.csv`).
 - All four together is best on both splits. Every client contributes, but A and B add only about 0.0005 each. That is why learned weights could set A to about 0 at little cost, yet equal weights still came out slightly ahead.
 - C and D carry the most signal: dropping either costs 0.003–0.004.
 - Every 2-client ensemble beats every single client on test. Most of the gain comes from combining models at all, not from which ones are combined.
+
+---
+
+## Per-finding triage: ≥ 0.90 precision and recall on auto-decided findings (2026-10-19)
+
+**Why.** On *all* test ECGs the selected equal-weight gate has macro precision 0.698 and recall 0.725
+(label-wise accuracy 0.869). The owner asked for precision, recall and accuracy ≥ 0.90. Retuning the
+decision thresholds cannot get there: precision and recall trade off, and the gate's ranking quality
+(macro AUROC 0.905) is the limit.
+
+**What was tried on fold 9 (no fold-10 use):**
+1. **Patient-level abstention** (auto-report an ECG only if all 5 decisions are confident): meeting the
+   targets left only ~5% of ECGs, all clearly normal, with no MI/STTC/CD/HYP positives. Rejected.
+2. **One global confidence cut-off on calibrated per-finding error.** Precision ≥ 0.90 and accuracy ≥ 0.94
+   at ~70% coverage, but recall stays ~0.66, because the gate misses some positives *confidently*
+   (probability near 0). Abstaining does not remove those misses. Rejected.
+3. **Per-class rule-in / rule-out bands** (selected by the owner on 2026-10-19, before fold 10 was used).
+
+**Method** (`src/cardiomoe/fourclient/triage.py`, config `fourclient.triage`):
+- For each class, p ≥ hi → positive and p ≤ lo → negative, both auto-reported. In between the finding
+  is indeterminate and referred.
+- Bands are fitted on the selected gate's patient-grouped 5-fold CV predictions on fold 9. Each band is
+  the widest one whose auto-decided findings reach precision, recall and accuracy ≥ 0.92 (target 0.90 +
+  margin 0.02), with ≥ 10% of the class's true positives auto-reported.
+- If no band qualifies, the class is **rule-out only**: confident negatives are auto-reported (NPV ≥ 0.95,
+  ≤ 5% of positives ruled out) and every possible positive is referred.
+- `python -m cardiomoe.fourclient.triage --seeds 42 43 44` adds a `triage` entry to
+  `gate/aggregate.json`. The combiners, weights and F1 thresholds are not touched. It then applies the
+  frozen bands once to the fold-10 probabilities already saved in `test_preds.pt` (no model re-run),
+  with a `triage_evaluated.json` marker that blocks reruns without `--rerun`.
+- The pushed `aggregate.json`/`combiners.pkl` were restored before this step. A re-fit on this Windows
+  CPU reproduced the selected equal-weight gate exactly (same thresholds, CV AUROC 0.9082). The
+  unselected static/dynamic combiners differed by about 0.001 (float nondeterminism) and were not used.
+
+**Modes chosen on fold 9:** NORM, MI and CD automated in all seeds. STTC automated in seed 44, rule-out
+only in 42/43. HYP rule-out only in all seeds.
+
+**Test results (fold 10, n = 2,158, mean ± SD over seeds 42, 43, 44):**
+
+| Class | Mode (seeds) | Auto-decided findings | Precision | Recall | Accuracy | NPV | True positives auto-reported |
+|---|---|---|---|---|---|---|---|
+| NORM | automated ×3 | 0.684 ± 0.000 | 0.927 ± 0.006 | 0.937 ± 0.004 | 0.949 ± 0.002 | 0.962 ± 0.001 | 0.537 ± 0.012 |
+| MI | automated ×3 | 0.479 ± 0.008 | 0.940 ± 0.011 | 0.915 ± 0.011 | 0.977 ± 0.004 | 0.984 ± 0.003 | 0.273 ± 0.020 |
+| STTC | automated ×1, rule_out ×2 | 0.551 ± 0.045 | 0.963 | 0.868 | 0.977 ± 0.008 | 0.978 ± 0.009 | 0.152 |
+| CD | automated ×3 | 0.600 ± 0.023 | 0.935 ± 0.005 | 0.880 ± 0.007 | 0.964 ± 0.002 | 0.970 ± 0.001 | 0.465 ± 0.010 |
+| HYP | rule_out ×3 | 0.370 ± 0.006 | – | – | 0.979 ± 0.001 | 0.979 ± 0.001 | – |
+
+| Gate, fold 10 | Precision | Recall | Accuracy | Coverage |
+|---|---|---|---|---|
+| All ECGs, all findings (no triage) | 0.698 | 0.725 | 0.869 (label-wise) | 100% |
+| **Auto-decided findings (triage)** | **0.937 ± 0.000** (macro, automated classes) | **0.908 ± 0.010** (macro, automated classes) | **0.967 ± 0.000** (all auto-decided findings) | 53.7% of findings; 17.8% of ECGs fully automatic (exact match 0.93) |
+
+**Verdict**
+1. Precision and accuracy are ≥ 0.90 for every automated class and seed. Macro recall over automated
+   classes is 0.908 on average (0.917 / 0.909 / 0.897 for seeds 42 / 43 / 44).
+2. **Not everything meets 0.90.** CD test recall is 0.880 (0.92 on fold 9), and STTC in seed 44 has
+   recall 0.868. Nothing was retuned on fold 10.
+3. **HYP cannot be ruled in reliably** in any seed, and STTC only in one. Those positives always go to a
+   cardiologist. Only 18% of ECGs are fully automatic, but on the rest most findings are pre-decided.
+4. The target is met on the **auto-decided** findings, not on every ECG. Coverage must always be
+   reported with these numbers.
+
+**Web portal (`web/`, CardioSentinel):** clinician and patient portals on top of the seed-42 models,
+gate and triage. The review queue holds ECGs with indeterminate findings. On the 48 seeded fold-10
+records, the portal's predictions match `test_preds.pt` to 1e-7. See `web/README.md`.
+
+**Files:** `outputs/fourclient/tables/{triage.md, triage.json}`, `outputs/fourclient/triage_evaluated.json`,
+`seed*/gate/aggregate.json` (`triage` key).

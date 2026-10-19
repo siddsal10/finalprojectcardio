@@ -84,5 +84,218 @@
     "C": 0.901012658780086,
     "D": 0.897827905581682
   },
-  "n_val": 2146
+  "n_val": 2146,
+  "triage": {
+    "bands": {
+      "NORM": {
+        "mode": "automated",
+        "lo": 0.29488046392798417,
+        "hi": 0.7828085780143738,
+        "fold9": {
+          "tp": 534,
+          "fp": 46,
+          "fn": 45,
+          "tn": 910,
+          "coverage": 0.7152842497670084,
+          "precision": 0.9206896551724137,
+          "recall": 0.9222797927461139,
+          "accuracy": 0.9407166123778502,
+          "npv": 0.9528795811518325,
+          "specificity": 0.9518828451882845,
+          "positive_auto": 0.5591623036649215,
+          "positive_ruled_out": 0.04712041884816754
+        }
+      },
+      "MI": {
+        "mode": "automated",
+        "lo": 0.28662848100066185,
+        "hi": 0.88976528942585,
+        "fold9": {
+          "tp": 171,
+          "fp": 12,
+          "fn": 14,
+          "tn": 898,
+          "coverage": 0.5102516309412861,
+          "precision": 0.9344262295081968,
+          "recall": 0.9243243243243243,
+          "accuracy": 0.9762557077625571,
+          "npv": 0.9846491228070176,
+          "specificity": 0.9868131868131869,
+          "positive_auto": 0.31666666666666665,
+          "positive_ruled_out": 0.025925925925925925
+        }
+      },
+      "STTC": {
+        "mode": "rule_out",
+        "lo": 0.3635825097560883,
+        "hi": null,
+        "fold9": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 25,
+          "tn": 1177,
+          "coverage": 0.5601118359739049,
+          "precision": NaN,
+          "recall": 0.0,
+          "accuracy": 0.9792013311148087,
+          "npv": 0.9792013311148087,
+          "specificity": 1.0,
+          "positive_auto": 0.0,
+          "positive_ruled_out": 0.04734848484848485
+        }
+      },
+      "CD": {
+        "mode": "automated",
+        "lo": 0.19848370552062986,
+        "hi": 0.8278528079390526,
+        "fold9": {
+          "tp": 248,
+          "fp": 21,
+          "fn": 21,
+          "tn": 1009,
+          "coverage": 0.6053122087604846,
+          "precision": 0.9219330855018587,
+          "recall": 0.9219330855018587,
+          "accuracy": 0.9676674364896074,
+          "npv": 0.9796116504854369,
+          "specificity": 0.9796116504854369,
+          "positive_auto": 0.501010101010101,
+          "positive_ruled_out": 0.04242424242424243
+        }
+      },
+      "HYP": {
+        "mode": "rule_out",
+        "lo": 0.20269760861992836,
+        "hi": null,
+        "fold9": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 13,
+          "tn": 738,
+          "coverage": 0.34995340167753963,
+          "precision": NaN,
+          "recall": 0.0,
+          "accuracy": 0.9826897470039947,
+          "npv": 0.9826897470039947,
+          "specificity": 1.0,
+          "positive_auto": 0.0,
+          "positive_ruled_out": 0.048507462686567165
+        }
+      }
+    },
+    "fold9_cv": {
+      "summary": {
+        "automated_classes": [
+          "NORM",
+          "MI",
+          "CD"
+        ],
+        "rule_out_classes": [
+          "STTC",
+          "HYP"
+        ],
+        "review_classes": [],
+        "macro_precision_automated": 0.9256829900608231,
+        "macro_recall_automated": 0.9228457341907657,
+        "macro_accuracy_automated": 0.9615465855433382,
+        "macro_coverage_automated": 0.610282696489593,
+        "finding_coverage": 0.5481826654240447,
+        "finding_accuracy": 0.9665079904794288,
+        "ecg_fully_automated": 0.17893755824790308,
+        "ecg_fully_automated_exact_match": 0.9557291666666666,
+        "n": 2146
+      },
+      "per_class": {
+        "NORM": {
+          "mode": "automated",
+          "tp": 534,
+          "fp": 46,
+          "fn": 45,
+          "tn": 910,
+          "coverage": 0.7152842497670084,
+          "precision": 0.9206896551724137,
+          "recall": 0.9222797927461139,
+          "accuracy": 0.9407166123778502,
+          "npv": 0.9528795811518325,
+          "specificity": 0.9518828451882845,
+          "positive_auto": 0.5591623036649215,
+          "positive_ruled_out": 0.04712041884816754
+        },
+        "MI": {
+          "mode": "automated",
+          "tp": 171,
+          "fp": 12,
+          "fn": 14,
+          "tn": 898,
+          "coverage": 0.5102516309412861,
+          "precision": 0.9344262295081968,
+          "recall": 0.9243243243243243,
+          "accuracy": 0.9762557077625571,
+          "npv": 0.9846491228070176,
+          "specificity": 0.9868131868131869,
+          "positive_auto": 0.31666666666666665,
+          "positive_ruled_out": 0.025925925925925925
+        },
+        "STTC": {
+          "mode": "rule_out",
+          "tp": 0,
+          "fp": 0,
+          "fn": 25,
+          "tn": 1177,
+          "coverage": 0.5601118359739049,
+          "precision": NaN,
+          "recall": 0.0,
+          "accuracy": 0.9792013311148087,
+          "npv": 0.9792013311148087,
+          "specificity": 1.0,
+          "positive_auto": 0.0,
+          "positive_ruled_out": 0.04734848484848485
+        },
+        "CD": {
+          "mode": "automated",
+          "tp": 248,
+          "fp": 21,
+          "fn": 21,
+          "tn": 1009,
+          "coverage": 0.6053122087604846,
+          "precision": 0.9219330855018587,
+          "recall": 0.9219330855018587,
+          "accuracy": 0.9676674364896074,
+          "npv": 0.9796116504854369,
+          "specificity": 0.9796116504854369,
+          "positive_auto": 0.501010101010101,
+          "positive_ruled_out": 0.04242424242424243
+        },
+        "HYP": {
+          "mode": "rule_out",
+          "tp": 0,
+          "fp": 0,
+          "fn": 13,
+          "tn": 738,
+          "coverage": 0.34995340167753963,
+          "precision": NaN,
+          "recall": 0.0,
+          "accuracy": 0.9826897470039947,
+          "npv": 0.9826897470039947,
+          "specificity": 1.0,
+          "positive_auto": 0.0,
+          "positive_ruled_out": 0.048507462686567165
+        }
+      }
+    },
+    "config": {
+      "targets": {
+        "precision": 0.9,
+        "recall": 0.9,
+        "accuracy": 0.9
+      },
+      "margin": 0.02,
+      "min_positive_auto": 0.1,
+      "rule_out": {
+        "min_npv": 0.95,
+        "max_missed": 0.05
+      },
+      "grid": 201
+    }
+  }
 }

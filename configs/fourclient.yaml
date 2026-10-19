@@ -43,5 +43,19 @@ fourclient:
       epochs: 300
       patience: 30
       batch_size: 128
+  # Per-finding triage (rule-in / rule-out) on the selected combiner, fitted on fold-9 CV
+  # predictions by `python -m cardiomoe.fourclient.triage` (see triage.py). Approved by the owner
+  # on 2026-10-19, before applying it to fold 10.
+  triage:
+    targets:                      # on auto-decided findings of an "automated" class
+      precision: 0.90
+      recall: 0.90
+      accuracy: 0.90
+    margin: 0.02                  # required on fold 9 on top of the targets
+    min_positive_auto: 0.10       # >= 10% of a class's true positives must be auto-reported
+    rule_out:                     # fallback: auto-report only confident negatives
+      min_npv: 0.95
+      max_missed: 0.05            # at most 5% of the class's positives may be auto-ruled-out
+    grid: 201
   bootstrap: 1000
   out_dir: outputs/fourclient

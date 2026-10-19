@@ -95,6 +95,22 @@ probabilities.
 - Per-class decision thresholds are tuned to maximise F1 on fold 9: on the CV predictions for
   combiners, and on each client's own fold-9 output for clients.
 
+### Per-finding triage (`src/cardiomoe/fourclient/triage.py`)
+
+Approved by the owner on 2026-10-19, before fold 10 was used for it. Goal: precision, recall and
+accuracy ≥ 0.90 on the findings the gate reports automatically. The rest are referred to a
+cardiologist, and coverage is always reported.
+
+- For each class: p ≥ hi → positive, p ≤ lo → negative, both auto-reported. In between the finding is
+  indeterminate and referred.
+- Bands are fitted per class on the selected combiner's patient-grouped CV predictions on fold 9. Each
+  is the widest band with precision, recall and accuracy ≥ target + 0.02 and ≥ 10% of the class's
+  true positives auto-reported (`automated`).
+- Otherwise the class is `rule_out`: only negatives with NPV ≥ 0.95 are auto-reported, ruling out
+  ≤ 5% of positives. If even that fails, the class is `review`.
+- The step adds a `triage` key to `gate/aggregate.json` without refitting the combiners, then applies
+  the frozen bands once to the fold-10 probabilities in `test_preds.pt` (`--rerun` needed after that).
+
 ## 7. Evaluation (`src/cardiomoe/fourclient/evaluate.py`)
 
 Run on fold 10 for each client and each combiner:
@@ -123,9 +139,11 @@ src/cardiomoe/
   fusion/     calibration.py (temperature scaling)
   eval/       metrics.py (AUROC, AUPRC, F1, thresholds, ECE, bootstrap)
   fourclient/ models.py, train.py, gate.py, aggregate.py, metrics.py, evaluate.py,
+              triage.py (per-finding rule-in / rule-out, run after evaluate),
               baseline.py (all-data baseline + leave-one-client-out, run after evaluate)
+web/          CardioSentinel portal (FastAPI + static SPA): clinician + patient views, see web/README.md
 tests/        splits / patient leakage, labels, features, signal, four-client models + gate + metrics
-data/, outputs/   git-ignored
+data/, web/data/  git-ignored; outputs/fourclient is committed (trained models, predictions, tables)
 ```
 
 ## 9. How to run
@@ -137,6 +155,8 @@ python -m cardiomoe.data.ptbxl --prepare
 python -m cardiomoe.fourclient.train --seeds 42 43 44
 python -m cardiomoe.fourclient.aggregate --seeds 42 43 44
 python -m cardiomoe.fourclient.evaluate --seeds 42 43 44     # fold 10: once
+python -m cardiomoe.fourclient.triage --seeds 42 43 44       # rule-in/rule-out bands on fold 9, applied once to fold 10
+python web/server.py                                         # CardioSentinel portal at http://127.0.0.1:8000
 python -m cardiomoe.fourclient.train --clients ALL --seeds 42 43 44   # reference: one model on folds 1-8
 python -m cardiomoe.fourclient.baseline --seeds 42 43 44     # baseline vs ensemble, client subsets
 ```
@@ -147,6 +167,8 @@ python -m cardiomoe.fourclient.baseline --seeds 42 43 44     # baseline vs ensem
   numbers are optimistic. Fold 10 is clean.
 - Each client sees only a quarter of the training data. One CNN-LSTM trained on all folds 1–8
   (`baselines.ALL`) reaches 0.909 test AUROC vs 0.905 for the ensemble; F1 is tied.
+- Triage meets the 0.90 targets on auto-decided findings only (about 54% of findings, 18% of ECGs
+  fully automatic). HYP is rule-out only and STTC is automated in 1 of 3 seeds. CD test recall is 0.880.
 - All clients see the same input modality. A per-patient gate therefore has little signal for
   deciding whom to trust. Across seeds 42–44 the dynamic gate never beat equal or static
   weights, and equal weights were selected.
