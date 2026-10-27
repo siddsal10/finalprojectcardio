@@ -1,0 +1,210 @@
+{
+ "n_features": 172,
+ "results": {
+  "Logistic Regression": [
+   {
+    "seed": 42,
+    "sec": 1.0,
+    "macro_auroc": 0.8795886241209073,
+    "macro_precision": 0.6531313373881282,
+    "macro_recall": 0.7168949390810719,
+    "macro_specificity": 0.8666998615252108,
+    "macro_f1": 0.681997407590323,
+    "macro_accuracy": 0.8442075996292864,
+    "macro_auprc": 0.7236096682504701,
+    "exact_match_accuracy": 0.5,
+    "labelwise_accuracy": 0.8442075996292864
+   },
+   {
+    "seed": 43,
+    "sec": 1.0,
+    "macro_auroc": 0.8795886241209073,
+    "macro_precision": 0.6531313373881282,
+    "macro_recall": 0.7168949390810719,
+    "macro_specificity": 0.8666998615252108,
+    "macro_f1": 0.681997407590323,
+    "macro_accuracy": 0.8442075996292864,
+    "macro_auprc": 0.7236096682504701,
+    "exact_match_accuracy": 0.5,
+    "labelwise_accuracy": 0.8442075996292864
+   },
+   {
+    "seed": 44,
+    "sec": 1.0,
+    "macro_auroc": 0.8795886241209073,
+    "macro_precision": 0.6531313373881282,
+    "macro_recall": 0.7168949390810719,
+    "macro_specificity": 0.8666998615252108,
+    "macro_f1": 0.681997407590323,
+    "macro_accuracy": 0.8442075996292864,
+    "macro_auprc": 0.7236096682504701,
+    "exact_match_accuracy": 0.5,
+    "labelwise_accuracy": 0.8442075996292864
+   }
+  ],
+  "SVM (RBF)": [
+   {
+    "seed": 42,
+    "sec": 83.9,
+    "macro_auroc": 0.8984301946703586,
+    "macro_precision": 0.6729997881575157,
+    "macro_recall": 0.745394208381695,
+    "macro_specificity": 0.8791561497207061,
+    "macro_f1": 0.7064424666093481,
+    "macro_accuracy": 0.8575532900834105,
+    "macro_auprc": 0.7716630542629843,
+    "exact_match_accuracy": 0.5403151065801668,
+    "labelwise_accuracy": 0.8575532900834105
+   },
+   {
+    "seed": 43,
+    "sec": 83.9,
+    "macro_auroc": 0.8984301946703586,
+    "macro_precision": 0.6729997881575157,
+    "macro_recall": 0.745394208381695,
+    "macro_specificity": 0.8791561497207061,
+    "macro_f1": 0.7064424666093481,
+    "macro_accuracy": 0.8575532900834105,
+    "macro_auprc": 0.7716630542629843,
+    "exact_match_accuracy": 0.5403151065801668,
+    "labelwise_accuracy": 0.8575532900834105
+   },
+   {
+    "seed": 44,
+    "sec": 83.9,
+    "macro_auroc": 0.8984301946703586,
+    "macro_precision": 0.6729997881575157,
+    "macro_recall": 0.745394208381695,
+    "macro_specificity": 0.8791561497207061,
+    "macro_f1": 0.7064424666093481,
+    "macro_accuracy": 0.8575532900834105,
+    "macro_auprc": 0.7716630542629843,
+    "exact_match_accuracy": 0.5403151065801668,
+    "labelwise_accuracy": 0.8575532900834105
+   }
+  ],
+  "Random Forest": [
+   {
+    "seed": 42,
+    "sec": 82.8,
+    "macro_auroc": 0.9005739899151145,
+    "macro_precision": 0.7006860945260929,
+    "macro_recall": 0.7225641023077188,
+    "macro_specificity": 0.8945783771375322,
+    "macro_f1": 0.7103709787126955,
+    "macro_accuracy": 0.8642261353104728,
+    "macro_auprc": 0.7756414309036054,
+    "exact_match_accuracy": 0.5509731232622799,
+    "labelwise_accuracy": 0.8642261353104727
+   },
+   {
+    "seed": 43,
+    "sec": 91.0,
+    "macro_auroc": 0.9017588092839766,
+    "macro_precision": 0.6814962720834528,
+    "macro_recall": 0.7482164105541709,
+    "macro_specificity": 0.883514858842356,
+    "macro_f1": 0.7096054961998371,
+    "macro_accuracy": 0.8600556070435589,
+    "macro_auprc": 0.7785067539693926,
+    "exact_match_accuracy": 0.5435588507877664,
+    "labelwise_accuracy": 0.8600556070435589
+   },
+   {
+    "seed": 44,
+    "sec": 94.5,
+    "macro_auroc": 0.9022463892793467,
+    "macro_precision": 0.6914693183853633,
+    "macro_recall": 0.7497451411619147,
+    "macro_specificity": 0.8845262297920294,
+    "macro_f1": 0.7147252481774284,
+    "macro_accuracy": 0.860982391102873,
+    "macro_auprc": 0.7785635595895759,
+    "exact_match_accuracy": 0.5426320667284523,
+    "labelwise_accuracy": 0.860982391102873
+   }
+  ],
+  "KNN": [
+   {
+    "seed": 42,
+    "sec": 2.0,
+    "macro_auroc": 0.85925878508049,
+    "macro_precision": 0.6076216511646615,
+    "macro_recall": 0.6893164337770572,
+    "macro_specificity": 0.8437348543264365,
+    "macro_f1": 0.644418876110296,
+    "macro_accuracy": 0.8222428174235403,
+    "macro_auprc": 0.6999528101479852,
+    "exact_match_accuracy": 0.47080630213160335,
+    "labelwise_accuracy": 0.8222428174235403
+   },
+   {
+    "seed": 43,
+    "sec": 2.0,
+    "macro_auroc": 0.85925878508049,
+    "macro_precision": 0.6076216511646615,
+    "macro_recall": 0.6893164337770572,
+    "macro_specificity": 0.8437348543264365,
+    "macro_f1": 0.644418876110296,
+    "macro_accuracy": 0.8222428174235403,
+    "macro_auprc": 0.6999528101479852,
+    "exact_match_accuracy": 0.47080630213160335,
+    "labelwise_accuracy": 0.8222428174235403
+   },
+   {
+    "seed": 44,
+    "sec": 2.0,
+    "macro_auroc": 0.85925878508049,
+    "macro_precision": 0.6076216511646615,
+    "macro_recall": 0.6893164337770572,
+    "macro_specificity": 0.8437348543264365,
+    "macro_f1": 0.644418876110296,
+    "macro_accuracy": 0.8222428174235403,
+    "macro_auprc": 0.6999528101479852,
+    "exact_match_accuracy": 0.47080630213160335,
+    "labelwise_accuracy": 0.8222428174235403
+   }
+  ],
+  "XGBoost": [
+   {
+    "seed": 42,
+    "sec": 23.3,
+    "macro_auroc": 0.9094293333687744,
+    "macro_precision": 0.6993293430542632,
+    "macro_recall": 0.7672437100050332,
+    "macro_specificity": 0.8822942933560641,
+    "macro_f1": 0.7280036453088365,
+    "macro_accuracy": 0.8674698795180724,
+    "macro_auprc": 0.7878713726310593,
+    "exact_match_accuracy": 0.5528266913809082,
+    "labelwise_accuracy": 0.8674698795180723
+   },
+   {
+    "seed": 43,
+    "sec": 22.4,
+    "macro_auroc": 0.9107034540747924,
+    "macro_precision": 0.6943221022271227,
+    "macro_recall": 0.7655708918846675,
+    "macro_specificity": 0.8852922918726109,
+    "macro_f1": 0.7265136047154647,
+    "macro_accuracy": 0.867655236329935,
+    "macro_auprc": 0.7921418141763596,
+    "exact_match_accuracy": 0.5644114921223355,
+    "labelwise_accuracy": 0.8676552363299351
+   },
+   {
+    "seed": 44,
+    "sec": 22.2,
+    "macro_auroc": 0.9069362536901293,
+    "macro_precision": 0.6971279952707542,
+    "macro_recall": 0.7561883912319894,
+    "macro_specificity": 0.8873726362460065,
+    "macro_f1": 0.7240147927215206,
+    "macro_accuracy": 0.8678405931417981,
+    "macro_auprc": 0.7857274444326474,
+    "exact_match_accuracy": 0.5602409638554217,
+    "labelwise_accuracy": 0.867840593141798
+   }
+  ]
+ }
+}

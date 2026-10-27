@@ -1,0 +1,26 @@
+\begin{abstract}
+Automatic interpretation of the 12-lead electrocardiogram (ECG) can speed up the detection of
+myocardial infarction, ischaemic changes, conduction disturbances and hypertrophy, but the deep
+networks that perform best are trained on centrally pooled data, whereas hospitals cannot share
+patient records. Federated learning removes this constraint, yet common methods average model
+parameters over many rounds and therefore force every institution to train the same architecture,
+and few ECG studies explain their predictions or state when a finding should be referred. This paper
+proposes CardioSentinel, a one-shot federated model in which four clients train structurally different
+networks (a 1D CNN, a 1D ResNet, a BiLSTM and a CNN-LSTM) on disjoint, patient-separated data, calibrate
+them with a temperature, and share only class probabilities with a server that combines them with
+weights on the probability simplex. Equal, learned static and per-patient dynamic weights are selected
+by patient-grouped cross-validation with a parsimony margin. Experiments use 21,388 records of PTB-XL
+for multi-label classification of five superclasses, with 80\% of the data for training, 10\% for
+validation and an untouched 10\% for testing, over three seeds. The federated model achieves a macro
+AUROC of 0.905, a macro F1 of 70.7\% and a label-wise accuracy of 86.9\%, improves on the best single
+client in every seed (+0.009 to +0.012 AUROC, paired bootstrap), and comes within 0.004 AUROC of a
+centrally trained model and within 0.002 of FedAvg, which needs 20 rounds and a shared architecture. Integrated Gradients localise the evidence in leads and
+waveform segments, and per-finding triage decides 53.7\% of findings automatically at 0.937 precision.
+Most of the benefit of pooling ECG data is thus obtained without exchanging data, parameters or
+architectures.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Electrocardiogram, federated learning, ensemble learning, multi-label classification, PTB-XL,
+explainable artificial intelligence, calibration.
+\end{IEEEkeywords}

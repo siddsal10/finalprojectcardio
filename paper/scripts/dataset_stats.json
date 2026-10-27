@@ -1,0 +1,76 @@
+{
+ "n_raw": 21799,
+ "patients_raw": 18869,
+ "n_kept": 21388,
+ "patients_kept": 18617,
+ "n_dropped": 411,
+ "label_cardinality": 1.298157811164856,
+ "multi_label_frac": 0.24050869646530765,
+ "age_mean": 59.40273894706914,
+ "age_sd": 16.785898207196166,
+ "female_frac": 0.48050308584252854,
+ "n_diag_statements": 44,
+ "train": {
+  "records": 17084,
+  "patients": 14823,
+  "NORM": 7596,
+  "MI": 4379,
+  "STTC": 4186,
+  "CD": 3907,
+  "HYP": 2119
+ },
+ "val": {
+  "records": 2146,
+  "patients": 1917,
+  "NORM": 955,
+  "MI": 540,
+  "STTC": 528,
+  "CD": 495,
+  "HYP": 268
+ },
+ "test": {
+  "records": 2158,
+  "patients": 1877,
+  "NORM": 963,
+  "MI": 550,
+  "STTC": 521,
+  "CD": 496,
+  "HYP": 262
+ },
+ "client_A": {
+  "records": 4277,
+  "patients": 3676,
+  "NORM": 1907,
+  "MI": 1087,
+  "STTC": 1050,
+  "CD": 966,
+  "HYP": 527
+ },
+ "client_B": {
+  "records": 4280,
+  "patients": 3722,
+  "NORM": 1918,
+  "MI": 1079,
+  "STTC": 1042,
+  "CD": 981,
+  "HYP": 525
+ },
+ "client_C": {
+  "records": 4264,
+  "patients": 3725,
+  "NORM": 1869,
+  "MI": 1125,
+  "STTC": 1060,
+  "CD": 990,
+  "HYP": 535
+ },
+ "client_D": {
+  "records": 4263,
+  "patients": 3700,
+  "NORM": 1902,
+  "MI": 1088,
+  "STTC": 1034,
+  "CD": 970,
+  "HYP": 532
+ }
+}

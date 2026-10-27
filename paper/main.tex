@@ -1,0 +1,45 @@
+\documentclass[journal]{IEEEtran}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\allowdisplaybreaks
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,shapes.geometric}
+\usepackage[hidelinks]{hyperref}
+\usepackage{cite}
+
+% Every number that does not exist in the project's outputs is marked with \todo{...}.
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO}\ifx\relax#1\relax\else: #1\fi\textbf{]}}}
+\graphicspath{{figures/}}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\begin{document}
+
+\title{CardioSentinel: A Multi-Model Federated Framework
+for ECG-Based Heart Disease Detection}
+
+\author{Siddhi Salunkhe (23BDS0243) and Sanvi Saket (23BDS0210)}
+
+\markboth{CardioSentinel, 2026}{Salunkhe and Saket: CardioSentinel}
+
+\maketitle
+
+\input{sections/abstract}
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/proposed_model}
+\input{sections/results}
+\input{sections/conclusion}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

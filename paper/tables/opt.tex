@@ -1,0 +1,10 @@
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Optimizer & Fold-9 AUROC & Best / run epochs & Train loss \\
+\midrule
+AdamW (used) & \textbf{0.898} & 23 / 31 & 0.444 \\
+Adam \cite{kingma2015adam} & 0.898 & 20 / 28 & 0.480 \\
+SGD (momentum 0.9) & 0.786 & 30 / 38 & 1.014 \\
+RMSprop (momentum 0.9) & 0.855 & 3 / 11 & 0.724 \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,16 @@
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & \multicolumn{2}{c}{Local (one client, mean of A--D)} & \multicolumn{2}{c}{Pooled (folds 1--8)} \\
+\cmidrule(lr){2-3}\cmidrule(l){4-5}
+Model & AUROC & F1 (\%) & AUROC & F1 (\%) \\
+\midrule
+Logistic Regression & 0.870 $\pm$ 0.001 & 67.0 $\pm$ 0.1 & 0.880 $\pm$ 0.000 & 68.2 $\pm$ 0.0 \\
+SVM (RBF) & 0.886 $\pm$ 0.002 & 68.8 $\pm$ 0.3 & 0.898 $\pm$ 0.000 & 70.6 $\pm$ 0.0 \\
+Random Forest & 0.894 $\pm$ 0.001 & 69.8 $\pm$ 0.2 & 0.902 $\pm$ 0.001 & 71.2 $\pm$ 0.2 \\
+KNN & 0.847 $\pm$ 0.004 & 63.3 $\pm$ 0.6 & 0.859 $\pm$ 0.000 & 64.4 $\pm$ 0.0 \\
+XGBoost & 0.898 $\pm$ 0.002 & 70.4 $\pm$ 0.4 & 0.909 $\pm$ 0.002 & 72.6 $\pm$ 0.2 \\
+\midrule
+Deep client C (BiLSTM) & 0.894 $\pm$ 0.000 & 69.2 $\pm$ 0.3 & -- & -- \\
+Deep client D (CNN-LSTM) & 0.896 $\pm$ 0.001 & 69.0 $\pm$ 0.1 & -- & -- \\
+\bottomrule
+\end{tabular}
