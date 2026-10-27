@@ -1,0 +1,16 @@
+{
+  "client": "B",
+  "arch": "resnet1d",
+  "folds": [
+    3,
+    4
+  ],
+  "n_train_real_pictures": 25,
+  "real_weight": 2,
+  "n_train_synthetic": 0,
+  "n_val_real_pictures": 59,
+  "init": "signal client",
+  "temperature": 2.7279183864593506,
+  "best_val_macro_auroc": 0.8240003716138016,
+  "epochs_run": 5
+}

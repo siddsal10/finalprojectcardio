@@ -2,10 +2,12 @@
 import { api, blobUrl, get, patch, post } from "./api.js";
 import { mountEcg } from "./ecg.js";
 import { mountMonitor } from "./monitor.js";
+import { assistantPage } from "./assistant.js";
+import { mountHeart } from "./heart3d.js";
 import { pipelineShell, playPipeline } from "./pipeline.js";
 import {
   $, CLASSES, CLASS_NAMES, LEVELS, MOODS, PLAIN, date, dateTime, esc, fileSize, findingList, icon, initials, modal,
-  moodFace, statusBadge, toast,
+  moodFace, pictureNotes, statusBadge, toast,
 } from "./ui.js";
 
 const shell = () => import("./app.js");
@@ -72,11 +74,11 @@ async function check(el) {
     <div class="steps"><span class="step on"><i>1</i>Add your ECG</span><span class="step on"><i>2</i>How you feel</span><span class="step"><i>3</i>Your result</span></div>
     <div class="grid g-2-1">
       <div class="stack" id="check-form">
-        <div class="card"><div class="card-head"><div><h2>1 · Add your ECG</h2><p>A 12-lead ECG file from your clinic or device.</p></div></div><div class="card-body">
-          <div class="dropzone" id="dz">${icon("upload")}<p style="margin:10px 0 2px"><b>Drop your ECG file here</b> or click to choose</p><p class="muted small">Digital ECG files: CSV, NPY or WFDB (.hea + .dat)</p><input type="file" id="file" multiple hidden accept=".npy,.csv,.txt,.hea,.dat"></div>
+        <div class="card"><div class="card-head"><div><h2>1 · Add your ECG</h2><p>A 12-lead ECG from your clinic or device: a photo or scan of the printout, or the file.</p></div></div><div class="card-body">
+          <div class="dropzone" id="dz">${icon("upload")}<p style="margin:10px 0 2px"><b>Drop your ECG file here</b> or click to choose</p><p class="muted small">Up to 4 photos, scans or a PDF of one printed ECG (more pictures give a steadier result), or a digital file (CSV, NPY, WFDB .hea + .dat)</p><input type="file" id="file" multiple hidden accept=".npy,.csv,.txt,.hea,.dat,.png,.jpg,.jpeg,.webp,.pdf"></div>
           <div id="file-list" class="small" style="margin-top:10px"></div>
           ${samples.length ? `<div class="divider"></div><div class="label" style="margin-bottom:8px">No ECG file? Try an example recording</div><div class="picks">${samples.map((s, i) => `<button class="pick" data-sample="${s.ecg_id}">${icon("activity")}Example ${i + 1}</button>`).join("")}</div>` : ""}
-          <div class="callout info" style="margin-top:16px">${icon("camera")}<div class="small">Only have a photo or PDF of your ECG? You can <a href="#/share">share it with your doctor</a>. Automatic checks of ECG photos are coming soon.</div></div>
+          <div class="callout info" style="margin-top:16px">${icon("camera")}<div class="small"><b>Photo of a paper ECG?</b> Lay the page flat, photograph it straight on with the whole page in the frame, in even light without shadows. A scan or the PDF from your clinic works best. We trace the waveform from your picture and show you the tracing.</div></div>
         </div></div>
         <div class="card"><div class="card-head"><div><h2>2 · How do you feel right now?</h2><p>Optional. Saved to your journal with this check.</p></div></div><div class="card-body">
           <div class="moods" id="c-moods" style="margin-bottom:14px">${MOODS.map(([v, f, t]) => `<button class="mood" data-v="${v}"><span>${f}</span>${t}</button>`).join("")}</div>
@@ -129,6 +131,15 @@ async function check(el) {
   el.querySelectorAll("[data-sample]").forEach((b) => b.addEventListener("click", () => run(() => post(`/api/me/analyze/sample/${b.dataset.sample}`), "Example recording")));
 }
 
+export async function downloadCsv(id) {
+  try {
+    const a = document.createElement("a");
+    a.href = await blobUrl(`/api/ecgs/${id}/signal.csv`);
+    a.download = `ecg_${id}.csv`;
+    a.click();
+  } catch (ex) { toast("Could not download the signal.", true); }
+}
+
 // ======================================================================= results
 async function results(el) {
   const rows = await get("/api/me/ecgs");
@@ -155,16 +166,18 @@ async function result(el, { id }) {
   const lv = LEVELS[levelOf(e)];
   const noteId = query().get("note");
   el.innerHTML = `
-    ${head(e.self_check ? "Your heart check" : "Your clinic ECG", `${dateTime(e.recorded_at)}${e.heart_rate ? ` · heart rate about ${Math.round(e.heart_rate)} beats per minute` : ""}`, `${e.pipeline ? `<button class="btn no-print" id="replay">${icon("cpu")}How this was analysed</button>` : ""}<button class="btn no-print" onclick="window.print()">${icon("printer")}Print</button>`, `<a href="#/results">My results</a> / ${date(e.recorded_at)}`)}
+    ${head(e.self_check ? "Your heart check" : "Your clinic ECG", `${dateTime(e.recorded_at)}${e.heart_rate ? ` · heart rate about ${Math.round(e.heart_rate)} beats per minute` : ""}`, `${e.pipeline ? `<button class="btn no-print" id="replay">${icon("cpu")}How this was analysed</button>` : ""}<button class="btn no-print" id="csv">${icon("download")}Signal (CSV)</button><button class="btn no-print" onclick="window.print()">${icon("printer")}Print</button>`, `<a href="#/results">My results</a> / ${date(e.recorded_at)}`)}
     <div class="grid g-2-1">
       <div class="stack">
         <div class="hero-status ${lv.tone}"><div class="monitor-inline" id="res-mon"></div><div class="eyebrow">${e.self_check ? "AI heart check" : e.reviewed_by ? `Reviewed by ${esc(e.reviewed_by)}` : "Clinic ECG"}</div>
           <h2>${lv.title}</h2><p>${esc(e.ai ? e.ai.advice : e.summary)}</p>
           ${e.ai && e.ai.unclear.length ? `<p style="margin-top:6px"><b>Unclear:</b> ${e.ai.unclear.map((c) => esc(CLASS_NAMES[c])).join(", ")}</p>` : ""}</div>
         ${e.ai && e.ai.urgent ? urgentBox() : ""}
+        ${e.pipeline ? pictureNotes({ pipeline: e.pipeline, image_quality: e.image_quality, image_agreement: e.image_agreement, image_auto_report: e.image_auto_report }) : ""}
         ${e.reviewed_by && e.self_check ? `<div class="callout good">${icon("stethoscope")}<div><b>${esc(e.reviewed_by)} reviewed this check.</b> ${esc(e.summary)}</div></div>` : ""}
         ${e.ai ? `<div class="card"><div class="card-head"><div><h2>What we checked</h2><p>Five early warning signs. "Unclear" means the AI could not decide, so a doctor should look.</p></div></div><div class="card-body flush">${findingList(e.ai.per_class)}</div></div>`
           : `<div class="card"><div class="card-head"><div><h2>What your doctor found</h2></div></div><div class="card-body flush">${CLASSES.map((c) => { const y = e.findings.includes(c); return `<div class="finding"><div class="ic" style="background:var(--${y ? (c === "NORM" ? "good" : "crit") : "surface-3"}${y ? "-soft" : ""});color:var(--${y ? (c === "NORM" ? "good" : "crit") : "ink-3"})">${icon(y ? (c === "NORM" ? "check" : "alert") : "x")}</div><div><h3>${esc(CLASS_NAMES[c])}</h3><p>${esc(PLAIN[c])}</p></div><div class="res"><span class="badge ${y ? (c === "NORM" ? "good" : "crit") : "neutral"}">${y ? (c === "NORM" ? "Yes" : "Found") : c === "NORM" ? "No" : "Not found"}</span></div></div>`; }).join("")}</div></div>`}
+        ${e.ai ? `<div class="card"><div class="card-head"><div><h2>Where on your heart</h2><p>Each finding lights up the part of the heart it usually comes from.</p></div></div><div class="card-body" id="heart3d"></div></div>` : ""}
         <div class="card"><div class="card-head" style="padding-bottom:12px"><div><h2>Your heart rhythm</h2><p>10 seconds of lead II. Each tall spike is one heartbeat.</p></div></div><div id="rhythm"></div></div>
       </div>
       <div class="stack">
@@ -184,6 +197,8 @@ async function result(el, { id }) {
   const sig = await get(`/api/ecgs/${id}/signal`);
   mountEcg($("#rhythm"), sig, { layout: "single", toolbar: false, rhythmLead: "II" });
   mountMonitor($("#res-mon"), { bpm: e.heart_rate || 72, color: "#ffffff", height: 120 });
+  if (e.ai) mountHeart($("#heart3d"), { perClass: e.ai.per_class, bpm: e.heart_rate || 72 });
+  $("#csv").addEventListener("click", () => downloadCsv(id));
   const rp = $("#replay");
   const replay = () => modal({
     title: "How your ECG was analysed", body: `<div id="pipe-modal"></div>`,
@@ -449,6 +464,7 @@ async function profile(el) {
 export const PATIENT_ROUTES = [
   { path: "/home", title: "Home", render: home },
   { path: "/check", title: "Check my heart", render: check },
+  { path: "/ask", title: "Ask about my heart", render: assistantPage },
   { path: "/results", title: "My results", render: results },
   { path: "/results/:id", title: "Result", render: result, nav: "#/results" },
   { path: "/journal", title: "How I feel", render: journal },

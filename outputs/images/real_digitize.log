@@ -1,0 +1,20 @@
+2026-10-27 14:54:48,118 INFO __main__: digitizing 13 real images of 82 fold-1 records
+2026-10-27 14:55:26,133 INFO __main__: digitizing 13 real images of 69 fold-2 records
+2026-10-27 14:56:09,970 INFO __main__: digitizing 13 real images of 91 fold-3 records
+2026-10-27 14:56:50,552 INFO __main__: digitizing 13 real images of 77 fold-4 records
+2026-10-27 14:57:34,258 INFO __main__: digitizing 13 real images of 92 fold-5 records
+2026-10-27 14:58:17,168 INFO __main__: digitizing 13 real images of 91 fold-6 records
+2026-10-27 14:58:58,299 INFO __main__: digitizing 13 real images of 76 fold-7 records
+2026-10-27 14:59:37,610 INFO __main__: digitizing 13 real images of 83 fold-8 records
+2026-10-27 15:00:17,823 INFO __main__: digitizing 60 real images of 87 fold-9 records
+2026-10-27 15:02:08,446 INFO __main__: digitizing 100 real images of 107 fold-10 records
+{"fold": 1, "images": 13, "records": 13, "digitized": 1.0, "median_r": 0.23936061782235984}
+{"fold": 2, "images": 13, "records": 10, "digitized": 1.0, "median_r": 0.35537899467785666}
+{"fold": 3, "images": 13, "records": 11, "digitized": 1.0, "median_r": 0.2582004330420163}
+{"fold": 4, "images": 13, "records": 11, "digitized": 0.9230769230769231, "median_r": 0.1511599989907944}
+{"fold": 5, "images": 13, "records": 12, "digitized": 1.0, "median_r": 0.25777018684110925}
+{"fold": 6, "images": 13, "records": 11, "digitized": 1.0, "median_r": 0.2128951246870007}
+{"fold": 7, "images": 13, "records": 13, "digitized": 1.0, "median_r": 0.31762921019826124}
+{"fold": 8, "images": 13, "records": 12, "digitized": 1.0, "median_r": 0.32346968375027046}
+{"fold": 9, "images": 60, "records": 45, "digitized": 0.9833333333333333, "median_r": 0.24766904069298126}
+{"fold": 10, "images": 100, "records": 62, "digitized": 0.98, "median_r": 0.29936939326715345}

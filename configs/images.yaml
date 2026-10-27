@@ -1,0 +1,43 @@
+# Image pipeline: a photo / scan / PDF of a printed 12-lead ECG -> trace segmenter + digitizer ->
+# (12, 1000) signal -> image clients A-D -> gate -> triage. Load as load_config("fourclient", "images").
+# The image clients are the signal clients fine-tuned on digitized printouts of their own folds,
+# so the partition, validation fold (9) and test fold (10) are the same as for the signal clients.
+fourclient:
+  out_dir: outputs/images          # image clients, gate, triage; the signal clients stay in outputs/fourclient
+images:
+  segnet: outputs/images/segnet.pt
+  synth_dir: data/processed/images # digitized synthetic printouts, one file per PTB-XL fold
+  seed: 42                         # printout styles / degradations are drawn from (seed, ecg_id)
+  auto_report: false               # photo results: refer every finding to a doctor. On real fold-10 photos (2026-10-27)
+                                   # the bands fitted on 59 fold-9 photos gave precision 0.87 / recall 0.81 (MI 0.60),
+                                   # below the 0.90 target; enable only after validating on more photos
+  quality_min: 0.35                # tracing quality (digitize._quality) below this: refer, nothing auto-reported
+  use_synthetic: false             # add build.py's synthetic printouts to the real training pictures
+  real_weight: 2                   # each real training picture counts this many times (synthetic printouts once)
+  finetune:                        # starts from the signal client of the same seed
+    epochs: 5
+    batch_size: 128
+    lr: 3.0e-4
+    weight_decay: 1.0e-2
+    schedule: onecycle
+    patience: 2
+    num_workers: 0
+    eval_batch_size: 128
+  real:                            # ECG-Image-Database, PTB-XL part (D0): real scans and photos
+    dir: data/raw/ecg_image_db/D0
+    train_images_per_fold: 13      # ~100 real training pictures over folds 1-8 (each client: its own 2 folds)
+    val_images: 60                 # real fold-9 pictures: early stopping, temperature, gate, thresholds, triage
+    dev_fold: 9                    # looked at while developing the digitizer
+    test_fold: 10                  # evaluated once (images/evaluate.py refuses a rerun without --rerun)
+    test_images: 100               # real fold-10 pictures in the test
+    variants:                      # image variant suffix -> capture, as seen on the fold-9 images (the PDFs 01/14 are skipped)
+      "02": digital (red grid)
+      "04": colour scan
+      "05": grayscale scan
+      "06": phone photo
+      "07": photo of a monitor
+      "10": phone photo, stained
+      "11": scan, stained
+      "12": colour scan
+      "13": grayscale scan
+      "15": digital (green grid)

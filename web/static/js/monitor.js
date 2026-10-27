@@ -10,7 +10,7 @@ const beatShape = (ph) => WAVES.reduce((a, [c, amp, w]) => a + amp * Math.exp(-0
  * mountMonitor(el, {bpm, color, speed, height, onBeat}) -> {setBpm, stop}
  * el gets a canvas that fills its width.
  */
-export function mountMonitor(el, { bpm = 72, color = "#e5355c", speed = 120, height = 90, onBeat, glow = true } = {}) {
+export function mountMonitor(el, { bpm = 72, color = "#c8102e", speed = 120, height = 90, onBeat, glow = true } = {}) {
   const canvas = document.createElement("canvas");
   canvas.style.width = "100%";
   canvas.style.height = `${height}px`;

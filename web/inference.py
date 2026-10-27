@@ -3,6 +3,10 @@
 The engine loads outputs/fourclient/seed{S}/{A,B,C,D}/model.pt, gate/combiners.pkl and
 gate/aggregate.json (selected combiner, fold-9 thresholds, triage rule). If they are missing
 the engine reports `available = False` and the website runs in demo mode.
+
+Photos, scans and PDFs of printed ECGs go through the digitizer (cardiomoe.images) and then the
+image clients in outputs/images/seed{S}/ (the same four architectures fine-tuned on digitized
+printouts) with their own gate and triage. Without them `image_available` is False.
 """
 from __future__ import annotations
 
@@ -31,6 +35,20 @@ CLASS_NAMES = {
 }
 
 
+class Stack:
+    """Four calibrated clients + the selected gate + its thresholds and triage, from one output dir."""
+
+    def __init__(self, cfg: dict, seed: int):
+        d = run_dir(cfg, seed, False)
+        self.agg = json.loads((d / "gate" / "aggregate.json").read_text())
+        with open(d / "gate" / "combiners.pkl", "rb") as f:
+            self.combiners = pickle.load(f)
+        self.clients = {c: load_client(cfg, c, seed, False, "cpu") for c in CLIENTS}
+        self.selected = self.agg["selected"]
+        self.th = np.array(self.agg["thresholds"][self.selected])
+        self.triage = Triage.from_dict(self.agg["triage"]) if "triage" in self.agg else None
+
+
 class Engine:
     def __init__(self, seed: int = 42):
         self.seed = seed
@@ -38,30 +56,36 @@ class Engine:
         self.available = False
         self.reason = ""
         try:
-            self._load()
+            self.signal = Stack(self.cfg, seed)
             self.available = True
         except FileNotFoundError as e:
             self.reason = f"Trained models not found ({Path(e.filename).name if e.filename else e})"
+        self.image_available = False
+        self.image_reason = ""
+        try:
+            from cardiomoe.images.build import img_config
+            from cardiomoe.images.segnet import load as load_segnet
 
-    def _load(self) -> None:
-        d = run_dir(self.cfg, self.seed, False)
-        self.agg = json.loads((d / "gate" / "aggregate.json").read_text())
-        with open(d / "gate" / "combiners.pkl", "rb") as f:
-            self.combiners = pickle.load(f)
-        self.clients = {c: load_client(self.cfg, c, self.seed, False, "cpu") for c in CLIENTS}
-        self.selected = self.agg["selected"]
-        self.th = np.array(self.agg["thresholds"][self.selected])
-        self.triage = Triage.from_dict(self.agg["triage"]) if "triage" in self.agg else None
+            self.image_cfg = img_config()
+            if load_segnet() is None:
+                raise FileNotFoundError(2, "trace segmenter not trained", "segnet.pt")
+            self.image = Stack(self.image_cfg, seed)
+            self.image_available = True
+        except FileNotFoundError as e:
+            self.image_reason = f"Image models not found ({Path(e.filename).name if e.filename else e})"
 
     def info(self) -> dict:
         if not self.available:
             return {"available": False, "reason": self.reason}
         fc = self.cfg["fourclient"]
-        return {"available": True, "seed": self.seed, "selected": self.selected,
-                "thresholds": dict(zip(SUPERCLASSES, self.th.tolist())),
-                "triage_modes": {c: b["mode"] for c, b in self.triage.bands.items()} if self.triage else None,
+        st = self.signal
+        return {"available": True, "seed": self.seed, "selected": st.selected,
+                "thresholds": dict(zip(SUPERCLASSES, st.th.tolist())),
+                "triage_modes": {c: b["mode"] for c, b in st.triage.bands.items()} if st.triage else None,
                 "clients": {c: {"arch": ARCH_NAMES[fc["clients"][c]["arch"]], "folds": fc["partition"][c]}
-                            for c in CLIENTS}}
+                            for c in CLIENTS},
+                "images": {"available": self.image_available, "reason": self.image_reason,
+                           "selected": self.image.selected if self.image_available else None}}
 
     @torch.no_grad()
     def predict(self, filtered: np.ndarray, meta: dict | None = None) -> dict:
@@ -71,23 +95,102 @@ class Engine:
         carries a `pipeline` record of every step, shown to users as an animated walkthrough.
         """
         t0 = time.perf_counter()
-        x = torch.from_numpy(normalize(filtered.astype(np.float32)))[None]
+        x = normalize(filtered.astype(np.float32))
+        return self._run(self.signal, x, filtered, meta, t0)
+
+    @torch.no_grad()
+    def predict_images(self, files: list[tuple[str, bytes]]) -> tuple[np.ndarray, dict]:
+        """One or more photos / scans / PDFs of the same printed ECG -> (digitized signal, prediction).
+
+        Every picture is digitized; the four image clients' probabilities are averaged over the
+        pictures that could be traced, then go through the image gate and triage. Several pictures of
+        one ECG give a steadier result, and their agreement is reported. If even the best picture's
+        tracing quality is below `images.quality_min`, nothing is auto-reported: every finding is
+        marked indeterminate (refer to a doctor) and the user is asked for a better picture.
+        """
+        from cardiomoe.images.digitize import DigitizeError, digitize, load_image
+        from cardiomoe.images.layouts import masked_normalize
+
+        t = time.perf_counter()
+        good, failed = [], []
+        for name, data in files:
+            try:
+                img = load_image(data, name)
+                good.append((name, data, img, digitize(img)))
+            except DigitizeError as e:
+                failed.append({"filename": name, "error": str(e)})
+        if not good:
+            raise DigitizeError(failed[0]["error"] if len(failed) == 1 else
+                                "; ".join(f"{f['filename']}: {f['error']}" for f in failed))
+        t_dig = time.perf_counter() - t
+        good.sort(key=lambda g: -g[3].quality.get("score", 0.0))
+        name, data, img, d = good[0]                     # the best tracing is the one shown
+        t0 = time.perf_counter()
+        x = np.stack([masked_normalize(g[3].signal, g[3].mask) for g in good])
+        pdf = name.lower().endswith(".pdf")
+        q = float(d.quality.get("score", 0.0))
+        q_min = float(self.image_cfg["images"]["quality_min"])
+        meta = {"filename": name if len(files) == 1 else f"{len(files)} pictures of one ECG",
+                "format": "PDF of a printed ECG" if pdf else "Photo or scan of a printed ECG",
+                "size_bytes": sum(len(b) for _, b in files), "fs_in": 100, "n_samples_in": 1000, "duration_s": 10.0,
+                "n_leads": 12, "leads": LEADS, "bad_values_fixed": 0, "raw_ii": None, "t_read_ms": 0.0,
+                "t_clean_ms": round(1000 * t_dig, 1),
+                "image": {**d.info(), "width": int(img.shape[1]), "height": int(img.shape[0]),
+                          "seconds_per_lead": {l: round(float(m.sum()) / 100, 1) for l, m in zip(LEADS, d.mask)},
+                          "overlay": overlay_data_url(d), "pictures_used": [g[0] for g in good],
+                          "pictures_failed": failed, "quality_score": round(q, 3), "quality_min": q_min,
+                          "quality_ok": q >= q_min},
+                "steps": [f"Found the paper and straightened it ({d.skew_deg:+.1f} degrees)",
+                          f"Traced the waveform ({d.rows} rows, {d.layout} layout)",
+                          "Turned the tracing into numbers: 25 mm per second, 10 mm per millivolt",
+                          "Scaled each lead over the part printed on the page"]
+                         + ([f"Combined {len(good)} pictures of the same ECG"] if len(good) > 1 else [])}
+        out = self._run(self.image, x, d.signal, meta, t0)
+        if len(good) > 1:  # spread of the gate probability across pictures, per finding
+            out["image_agreement"] = out.pop("_per_input_spread")
+        out.pop("_per_input_spread", None)
+        auto = bool(self.image_cfg["images"].get("auto_report", False))
+        if q < q_min or not auto:   # unreliable tracing, or photo triage not validated: refer rather than risk a confident error
+            out["triage"] = {c: "indeterminate" for c in SUPERCLASSES}
+            out["indeterminate"] = list(SUPERCLASSES)
+            out["auto_report"] = False
+            out["decisions"] = out["suggested"]
+        out["image_auto_report"] = auto
+        out["image_quality"] = {"score": round(q, 3), "min": q_min, "ok": q >= q_min,
+                                "advice": None if q >= q_min else "The tracing of this picture is not reliable enough "
+                                "to report findings automatically. A doctor should review it; a flat, straight-on photo "
+                                "in even light, a scan or the clinic PDF gives a better result."}
+        return d.signal, out
+
+    def predict_image(self, data: bytes, filename: str) -> tuple[np.ndarray, dict]:
+        return self.predict_images([(filename, data)])
+
+    def _run(self, st: "Stack", x: np.ndarray, filtered: np.ndarray, meta: dict | None, t0: float) -> dict:
+        """x: model input (12, 1000), or (n, 12, 1000) for n inputs of the same ECG (probabilities are
+        averaged per client before the gate); filtered: the signal in mV shown to users."""
         t_norm = time.perf_counter() - t0
+        x = torch.from_numpy(x)
+        if x.ndim == 2:
+            x = x[None]
         P, readers = [], []
         fc = self.cfg["fourclient"]
         for c in CLIENTS:
             t = time.perf_counter()
-            m = self.clients[c]
-            P.append(torch.sigmoid(m({"signal": x}).logits / m.temperature))
+            m = st.clients[c]
+            P.append(torch.sigmoid(m({"signal": x}).logits / m.temperature))   # [n, 5]
             readers.append({"key": c, "arch": ARCH_NAMES[fc["clients"][c]["arch"]], "role": READER_ROLES[c],
                             "ms": round(1000 * (time.perf_counter() - t), 1),
-                            "probs": dict(zip(SUPERCLASSES, map(float, P[-1][0])))})
-        P = torch.stack(P, dim=1).float()  # [1, 4, 5]
+                            "probs": dict(zip(SUPERCLASSES, map(float, P[-1].mean(0))))})
+        P_all = torch.stack(P, dim=1).float()  # [n, 4, 5]
+        P = P_all.mean(0, keepdim=True)        # [1, 4, 5]
         t = time.perf_counter()
-        comb = self.combiners[self.selected]
+        comb = st.combiners[st.selected]
         p = comb.predict(P).numpy()[0]
         w = comb.weights(P).numpy()[0]
-        out = package(p, P.numpy()[0], w, self.th, self.triage)
+        out = package(p, P.numpy()[0], w, st.th, st.triage)
+        if len(P_all) > 1:
+            each = comb.predict(P_all).numpy()
+            out["_per_input_spread"] = {c: float(each[:, i].max() - each[:, i].min()) for i, c in enumerate(SUPERCLASSES)}
         t_gate = time.perf_counter() - t
         meta = meta or {}
         pre = (meta.get("t_read_ms") or 0) + (meta.get("t_clean_ms") or 0)
@@ -109,6 +212,27 @@ READER_ROLES = {"A": "Looks for local wave shapes", "B": "Looks for deep, layere
 CLEAN_STEPS = ["Put the 12 leads in standard order", "Resampled to 100 samples per second",
                "Trimmed or padded to exactly 10 seconds", "Removed baseline drift and noise (0.5-40 Hz filter)",
                "Scaled each lead to a common range"]
+
+
+IMAGE_TYPES = (".png", ".jpg", ".jpeg", ".webp", ".pdf")
+
+
+def is_image(filename: str) -> bool:
+    return filename.lower().endswith(IMAGE_TYPES)
+
+
+def overlay_data_url(d) -> str:
+    """The tracing drawn on the straightened photo, as a small JPEG data URL (stored with the result)."""
+    import base64
+
+    from PIL import Image
+
+    from cardiomoe.images.digitize import overlay_png
+
+    img = Image.open(io.BytesIO(overlay_png(d, max_w=1100))).convert("RGB")
+    buf = io.BytesIO()
+    img.save(buf, "JPEG", quality=72)
+    return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
 def _thin(x, n: int = 500) -> list:

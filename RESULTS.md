@@ -321,3 +321,50 @@ records, the portal's predictions match `test_preds.pt` to 1e-7. See `web/README
 
 **Files:** `outputs/fourclient/tables/{triage.md, triage.json}`, `outputs/fourclient/triage_evaluated.json`,
 `seed*/gate/aggregate.json` (`triage` key).
+
+
+---
+
+## 2026-10-27: Photos of paper ECGs, voice assistant, redesign (owner requests)
+
+**Owner decisions (2026-10-26/27):** add ECG-Image-Database (Kaggle `physionet/ecg-image-database`, CC BY-ND 4.0),
+PTB-XL part only: real printouts of PTB-XL records that were scanned, photographed, photographed off monitors and
+stained, paired with the recorded signal. It contains no records outside PTB-XL; folds and the test split are unchanged.
+Use only ~100 real training photos for now.
+
+**Pipeline (`src/cardiomoe/images/`):** `synth.py` draws synthetic printouts (ECG-Image-Kit and classic styles, any
+grid colour, photo/scan/monitor/stain/curl damage) with a pixel-exact trace mask. `segnet.py` is a half-resolution U-Net
+trace segmenter trained only on those (4,000 steps, CPU, validation Dice 0.853). `digitize.py` straightens the page, tracks
+row baselines across strips, follows the 1-pixel centre line (Zhang-Suen thinning), takes each row's own start/end as
+10 s and outputs the (12, 1000) signal + printed-sample mask + a quality score. `real.py` digitizes the real photos
+(13 per training fold = 104, 60 fold-9, 100 fold-10, stratified by capture type). `finetune.py` fine-tunes each signal
+client on the real photos of its own folds (x2 weight); early stopping, temperature, gate and triage on the fold-9 photos.
+`evaluate.py` runs the one-time fold-10 photo test.
+
+**Digitizer accuracy** (median per-lead correlation with the recorded signal, fold 10): digital red grid 0.78, colour
+scan 0.44, phone photo 0.34, monitor photo 0.34, grayscale scan 0.19, green grid 0.18, stained scan 0.12, stained phone
+photo 0.00. 98% of photos digitized. The main remaining error is the time axis on faint/curled strips.
+
+**Real fold-10 photos (100 photos, 62 records, seed 42, run once):**
+
+| Model | Macro AUROC (95% CI by record) | Macro F1 | Exact match |
+|---|---|---|---|
+| Image gate (static weights, ~all on D) | 0.841 (0.746-0.916) | 0.558 | 0.388 |
+| Signal gate on the same digitized photos (no fine-tuning) | 0.859 (0.792-0.919) | 0.343 | 0.082 |
+| Signal gate on the recorded signal of the same records | 0.946 (0.906-0.975) | 0.696 | 0.684 |
+
+Triage on photos (bands fitted on 59 fold-9 photos): 50% of findings auto-decided, accuracy 0.943, but macro precision
+0.873 and recall 0.812 (MI precision 0.60) - **below the 0.90 target**. So the portal refers every photo finding to a
+doctor (`images.auto_report: false`) until the bands are fitted on more validation photos. Fine-tuning on 104 photos did
+not raise AUROC over the untuned models (0.841 vs 0.859); it fixed the thresholds (F1, exact match).
+
+**Gate formulas re-examined (fold-9 grouped CV, seeds 42-44, signal pipeline; no fold-10 use):** equal 0.9087, logit mean
+0.9089, per-class weights 0.9047, stacked LR on 20 probabilities 0.9075, stacked LR per class 0.9084. Nothing clears the
+0.002 rule, so equal weights stay. Stricter triage targets trade coverage for precision/recall on fold 9: 0.90 -> 54% of
+findings auto, P/R 0.926/0.923; 0.95 -> 39%, 0.976/0.973; 0.97 -> 33%, 0.995/0.994. Not changed (owner decision).
+
+**Portal:** photo/scan/PDF upload (up to 4 pictures of one ECG, averaged, agreement shown), tracing overlay, picture
+quality gate, CSV export of the signal, 3-D heart showing the usual region of each finding, voice assistant (`web/assistant.py`:
+TF-IDF retrieval over the patient's own records + OpenRouter LLM via `OPENROUTER_API_KEY`/`OPENROUTER_MODEL`, offline
+extractive answers without a key; browser speech recognition and synthesis), full visual redesign (warm paper / navy /
+crimson, Space Grotesk + Space Mono). Tests: `tests/test_images.py` (9) and `tests/test_web.py` (5) pass.

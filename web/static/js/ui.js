@@ -4,6 +4,7 @@ export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
 const P = {
+  mic: '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><path d="M12 18v4"/>',
   dashboard: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
   users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
   user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
@@ -56,7 +57,7 @@ export const icon = (name, cls = "") =>
   `<svg class="${cls}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[name] || ""}</svg>`;
 
 // Lucide "heart-pulse" (ISC licence): the heart beats and the pulse line draws itself (see .brand-mark in app.css).
-export const LOGO = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="heart" d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path class="pulse" d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg>`;
+export const LOGO = `<svg viewBox="0 0 44 24" width="40" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="pulse" d="M1 13h11l3-7 5 14 4-11 2 4h17"/></svg>`;
 
 // ---------------------------------------------------------------- formatting
 export const fmt = (v, d = 3) => (v === null || v === undefined || Number.isNaN(v) ? "–" : Number(v).toFixed(d));
@@ -182,4 +183,20 @@ export function tip(html, ev) {
   const y = Math.min(ev.clientY + 14, window.innerHeight - tipEl.offsetHeight - 8);
   tipEl.style.left = `${x}px`;
   tipEl.style.top = `${y}px`;
+}
+
+/** Notes for a result read from a picture of a paper ECG: quality warning, multi-picture agreement, coverage. */
+export function pictureNotes(pred) {
+  const pl = pred && pred.pipeline, im = pl && pl.input && pl.input.image;
+  if (!im) return "";
+  const q = pred.image_quality, ag = pred.image_agreement;
+  const short = Object.entries(im.seconds_per_lead || {}).filter(([, s]) => s < 9.9).map(([l]) => l);
+  const spread = ag ? Math.max(...Object.values(ag)) : null;
+  const referNote = pred.image_auto_report === false && !(q && !q.ok)
+    ? `<div class="callout warn">${icon("stethoscope")}<div class="small"><b>A doctor reviews every result read from a picture.</b> Readings from photos are not yet accurate enough to report findings automatically, so all five are marked unclear. The likelihoods are shown for your doctor.</div></div>` : "";
+  return `${referNote}${q && !q.ok ? `<div class="callout warn">${icon("camera")}<div class="small"><b>Picture quality too low for an automatic result</b> (tracing quality ${Math.round(q.score * 100)}%, needs ${Math.round(q.min * 100)}%). ${esc(q.advice || "")}</div></div>` : ""}
+    <div class="callout info">${icon("camera")}<div class="small">Read from ${im.pictures_used && im.pictures_used.length > 1 ? `${im.pictures_used.length} pictures` : "a picture"} of a paper ECG (${esc(im.layout)} layout, tracing quality ${Math.round((im.quality_score ?? 0) * 100)}%).
+      ${short.length ? ` Leads ${esc(short.join(", "))} were printed for 2.5 s each; the others for 10 s.` : " Every lead was printed for 10 s."}
+      ${spread !== null ? ` The pictures agreed to within ${Math.round(spread * 100)} percentage points on every finding.` : ""}
+      ${im.pictures_failed && im.pictures_failed.length ? ` ${im.pictures_failed.length} picture(s) could not be traced and were not used.` : ""}</div></div>`;
 }

@@ -27,7 +27,7 @@ import store  # noqa: E402
 from cardiomoe.data.labels import SUPERCLASSES  # noqa: E402
 from cardiomoe.data.signal import LEADS  # noqa: E402
 from demo import patient_summary, seed  # noqa: E402
-from inference import CLASS_NAMES, Engine, parse_upload, sample_meta  # noqa: E402
+from inference import CLASS_NAMES, Engine, is_image, parse_upload, sample_meta  # noqa: E402
 from store import dumps, loads, now  # noqa: E402
 
 log = logging.getLogger("cardiosentinel")
@@ -308,6 +308,37 @@ def ecg_signal(eid: int, u: dict = Depends(current_user)):
     return {"fs": 100, "leads": LEADS, "units": "mV", "data": np.round(sig, 3).tolist()}
 
 
+@app.get("/api/ecgs/{eid}/signal.csv")
+def ecg_signal_csv(eid: int, u: dict = Depends(current_user)):
+    """The 12-lead signal as CSV (time in s + one column per lead, mV). For a picture this is the
+    digitized signal; leads are empty where they were not printed."""
+    from fastapi.responses import Response
+
+    e = visible_ecg(eid, u)
+    sig = store.load_signal(eid)
+    pl = (loads(e.get("prediction")) or {}).get("pipeline") or {}
+    printed = ((pl.get("input") or {}).get("image") or {}).get("seconds_per_lead")
+    lines = ["time_s," + ",".join(LEADS)]
+    for t in range(sig.shape[1]):
+        row = []
+        for i, l in enumerate(LEADS):
+            visible = printed is None or _printed(l, t, printed)
+            row.append(f"{sig[i, t]:.3f}" if visible else "")
+        lines.append(f"{t / 100:.2f}," + ",".join(row))
+    return Response("\n".join(lines) + "\n", media_type="text/csv",
+                    headers={"Content-Disposition": f'attachment; filename="ecg_{eid}.csv"'})
+
+
+def _printed(lead: str, t: int, seconds: dict) -> bool:
+    """Was sample t of this lead on the page? 10 s leads: always; 2.5 s leads: their column of the 3x4 grid."""
+    from cardiomoe.images.layouts import GRID_3x4
+
+    if seconds.get(lead, 10) >= 9.9:
+        return True
+    col = next((r.index(lead) for r in GRID_3x4 if lead in r), None)
+    return col is not None and col * 250 <= t < (col + 1) * 250
+
+
 class Review(BaseModel):
     final_labels: dict[str, int]
     notes: str = ""
@@ -344,11 +375,37 @@ async def analyze(files: list[UploadFile] = File(...), fs: int = Form(100), pati
     if not engine.available:
         raise HTTPException(503, f"Live analysis needs the trained models: {engine.reason}. "
                                  "Run the training pipeline (see web/README.md).")
+    data = {f.filename: await f.read() for f in files}
+    if any(is_image(n) for n in data):
+        sig, pred = _analyze_image(data, "Could not read the ECG image")
+        return _store_prediction(sig, pred, patient_id, indication, "Photo / scan", files[0].filename, u)
     try:
-        sig, meta = parse_upload({f.filename: await f.read() for f in files}, fs)
+        sig, meta = parse_upload(data, fs)
     except Exception as ex:
         raise HTTPException(400, f"Could not read the ECG: {ex}")
     return _store_prediction(sig, engine.predict(sig, meta), patient_id, indication, "Upload", files[0].filename, u)
+
+
+MAX_PICTURES = 4
+
+
+def _analyze_image(data: dict, what: str):
+    """Photos / scans / PDFs of one printed ECG -> (digitized signal, prediction)."""
+    from cardiomoe.images.digitize import DigitizeError
+
+    if not engine.image_available:
+        raise HTTPException(503, f"Reading ECG photos needs the image models: {engine.image_reason}. "
+                                 "Run the image pipeline (see web/README.md).")
+    imgs = [n for n in data if is_image(n)]
+    if len(imgs) != len(data):
+        raise HTTPException(400, "Upload either pictures of a printed ECG or a digital ECG file, not both.")
+    if len(imgs) > MAX_PICTURES:
+        raise HTTPException(400, f"Upload at most {MAX_PICTURES} pictures of the same ECG.")
+    try:
+        return engine.predict_images([(n, data[n]) for n in imgs])
+    except DigitizeError as ex:
+        raise HTTPException(400, f"{what}: {ex}. Take the photo straight on, with the whole ECG page in the frame "
+                                 "and no shadows, or upload a scan or PDF.")
 
 
 @app.get("/api/samples")
@@ -527,6 +584,9 @@ def patient_view(e: dict) -> dict:
             "self_check": self_check, "shared": bool(e["shared"]),
             "submission": sub_, "ai": ai_for_patient(e["prediction"]) if self_check else None,
             "pipeline": e["prediction"].get("pipeline") if self_check else None,
+            "image_quality": e["prediction"].get("image_quality") if self_check else None,
+            "image_agreement": e["prediction"].get("image_agreement") if self_check else None,
+            "image_auto_report": e["prediction"].get("image_auto_report") if self_check else None,
             "demo": e["demo"]}
 
 
@@ -647,8 +707,12 @@ async def my_analyze(files: list[UploadFile] = File(...), fs: int = Form(100), i
                      u: dict = Depends(patient_user)):
     if not engine.available:
         raise HTTPException(503, "ECG checks are not available right now.")
+    data = {f.filename: await f.read() for f in files}
+    if any(is_image(n) for n in data):
+        sig, pred = _analyze_image(data, "We could not read the ECG in this picture")
+        return _self_check(sig, pred, u, files[0].filename, indication)
     try:
-        sig, meta = parse_upload({f.filename: await f.read() for f in files}, fs)
+        sig, meta = parse_upload(data, fs)
     except Exception as ex:
         raise HTTPException(400, f"We could not read this file as a 12-lead ECG ({ex}).")
     return _self_check(sig, engine.predict(sig, meta), u, files[0].filename, indication)
@@ -660,6 +724,100 @@ def my_analyze_sample(ecg_id: int, u: dict = Depends(patient_user)):
         raise HTTPException(503, "ECG checks are not available right now.")
     sig, _ = _sample_signal(ecg_id)
     return _self_check(sig, engine.predict(sig, sample_meta(sig, "Example recording")), u, f"Example recording {ecg_id}", "Example recording")
+
+
+# --------------------------------------------------------------------------- voice assistant (RAG over the patient's records)
+FEELING_WORDS = {1: "very bad", 2: "bad", 3: "okay", 4: "good", 5: "very good"}
+RESULT_WORDS = {"positive": "found", "negative": "not found", "indeterminate": "unclear"}
+
+
+def patient_passages(pid: int) -> list:
+    """Everything the patient can see, as short passages for retrieval (same visibility as the patient API)."""
+    from assistant import Passage
+
+    out = []
+    p = get_patient(pid)
+    prof = [f"{p['name']}", f"age {age(p['dob'])}" if p["dob"] else "", p["sex"] or "",
+            f"conditions: {p['conditions']}" if p["conditions"] else "", f"medications: {p['medications']}" if p["medications"] else "",
+            f"allergies: {p['allergies']}" if p["allergies"] else ""]
+    doc = db.one("SELECT name FROM users WHERE id = ?", (p["clinician_id"],))
+    if doc:
+        prof.append(f"doctor: {doc['name']}")
+    out.append(Passage("profile", "profile", "", "Your profile", ", ".join(x for x in prof if x)))
+    for e in db.q("SELECT * FROM ecgs WHERE patient_id = ? ORDER BY recorded_at", (pid,)):
+        if not (e["released"] or is_self_check(e)):
+            continue
+        v = patient_view(ecg_row(e))
+        if v["ai"]:
+            res = "; ".join(f"{CLASS_NAMES[c]} {RESULT_WORDS[t]} (AI likelihood {round(100 * pr['probs'][c])}%)"
+                            for c, t in pr["triage"].items()) if (pr := loads(e["prediction"])) else ""
+            text = f"AI heart check: {v['ai']['advice']} Results: {res}."
+        else:
+            text = f"Result: {v['summary']}"
+        if v["heart_rate"]:
+            text += f" Heart rate about {round(v['heart_rate'])} beats per minute."
+        if v["reviewed_by"]:
+            text += f" Reviewed by {v['reviewed_by']}: findings {', '.join(CLASS_NAMES[c] for c in v['findings']) or 'none'}. {v['summary']}"
+        if v["self_check"]:
+            text += " Shared with your doctor." if v["shared"] else " Not shared with your doctor yet."
+        out.append(Passage(f"check {e['id']}", "check", e["recorded_at"], "Heart check" if v["self_check"] else "Clinic ECG", text))
+    for n in db.q("SELECT * FROM notes WHERE patient_id = ? ORDER BY created_at", (pid,)):
+        sym = ", ".join(loads(n["symptoms"]) or []) or "no symptoms ticked"
+        bits = [f"felt {FEELING_WORDS.get(n['feeling'], 'not recorded')}", f"symptoms: {sym}"]
+        if n["severity"] is not None:
+            bits.append(f"strength {n['severity']} out of 10")
+        if n["started"]:
+            bits.append(f"started {n['started']}")
+        if n["body"]:
+            bits.append(f'note: "{n["body"]}"')
+        out.append(Passage(f"journal {n['id']}", "journal", n["created_at"], "Symptom journal", "; ".join(bits) + "."))
+    for m in db.q("SELECT m.*, u.name AS sender, u.role FROM messages m JOIN users u ON u.id = m.sender_id "
+                  "WHERE m.patient_id = ? ORDER BY m.created_at", (pid,)):
+        who = "You wrote" if m["role"] == "patient" else f"{m['sender']} wrote"
+        out.append(Passage(f"message {m['id']}", "message", m["created_at"], "Message", f'{who}: "{m["body"]}"'))
+    for a in db.q("SELECT * FROM appointments WHERE patient_id = ? ORDER BY starts_at", (pid,)):
+        out.append(Passage(f"appointment {a['id']}", "appointment", a["starts_at"], "Appointment",
+                           f"{a['kind']} on {a['starts_at'][:16].replace('T', ' at ')}, {a['location'] or 'location not set'}, status {a['status']}."
+                           + (f" Notes: {a['notes']}" if a["notes"] else "")))
+    for x in db.q("SELECT s.*, u.name AS replier FROM submissions s LEFT JOIN users u ON u.id = s.replied_by "
+                  "WHERE s.patient_id = ? ORDER BY s.created_at", (pid,)):
+        text = f"You shared {'heart check ' + str(x['ecg_id']) if x['ecg_id'] else 'notes'} with your doctor"
+        text += f' with the message "{x["message"]}"' if x["message"] else ""
+        text += f". Status: {x['status']}."
+        if x["reply"]:
+            text += f' {x["replier"] or "Your doctor"} replied: "{x["reply"]}"'
+        out.append(Passage(f"share {x['id']}", "share", x["created_at"], "Shared with doctor", text))
+    return out
+
+
+class Ask(BaseModel):
+    question: str
+    history: list[dict] = []
+
+
+@app.post("/api/me/assistant")
+def my_assistant(body: Ask, u: dict = Depends(patient_user)):
+    """Voice / chat assistant: answers from the patient's own records only."""
+    import assistant
+
+    q = body.question.strip()
+    if not q:
+        raise HTTPException(400, "Ask a question first.")
+    if len(q) > 1000:
+        raise HTTPException(400, "Please keep the question under 1000 characters.")
+    res = assistant.answer(q, patient_passages(u["patient_id"]), body.history)
+    db.audit(u["id"], "assistant", f"{res['mode']}: {len(res['sources'])} records")
+    return res
+
+
+@app.get("/api/me/assistant")
+def my_assistant_info(u: dict = Depends(patient_user)):
+    import assistant
+
+    cfg = assistant.llm_config()
+    return {"mode": "openrouter" if cfg else "offline", "model": cfg["model"] if cfg else None,
+            "suggestions": ["How was my last heart check?", "What did my doctor say?", "When is my next appointment?",
+                            "How have I been feeling this week?", "Was anything unclear in my results?"]}
 
 
 SYMPTOMS = ["Chest pain or pressure", "Palpitations", "Shortness of breath", "Dizziness or light-headedness",

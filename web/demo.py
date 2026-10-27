@@ -161,8 +161,8 @@ def seed(db: DB, engine, n_patients: int = 36, seed_: int = 7) -> str:
             log.warning("real PTB-XL seeding failed (%s); using synthetic ECGs", e)
     if not records:
         mode = "synthetic"
-        th = engine.th if engine.available else np.array([0.42, 0.62, 0.62, 0.64, 0.64])
-        records = list(_synthetic_records(n_patients * 2, rng, th, engine.triage if engine.available else None))
+        th = engine.signal.th if engine.available else np.array([0.42, 0.62, 0.62, 0.64, 0.64])
+        records = list(_synthetic_records(n_patients * 2, rng, th, engine.signal.triage if engine.available else None))
 
     today = datetime.now(timezone.utc).replace(microsecond=0)
     local = datetime.now().astimezone().replace(microsecond=0)

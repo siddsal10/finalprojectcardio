@@ -1,0 +1,16 @@
+{
+  "client": "A",
+  "arch": "cnn1d",
+  "folds": [
+    1,
+    2
+  ],
+  "n_train_real_pictures": 26,
+  "real_weight": 2,
+  "n_train_synthetic": 0,
+  "n_val_real_pictures": 59,
+  "init": "signal client",
+  "temperature": 4.16104793548584,
+  "best_val_macro_auroc": 0.8795354015680695,
+  "epochs_run": 5
+}

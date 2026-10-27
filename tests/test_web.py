@@ -92,3 +92,15 @@ def test_signup_selfcheck_privacy_and_share(client):
     assert detail["status"] == "seen" and len(detail["notes"]) == 1 and len(detail["attachments"]) == 1
     client.post(f"/api/submissions/{sub['id']}/reply", headers=hc, json={"body": "All good"})
     assert client.get(f"/api/me/submissions/{sub['id']}", headers=hp).json()["reply"] == "All good"
+
+
+def test_assistant_answers_from_own_records(client, monkeypatch):
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)   # offline mode: no network in tests
+    hp = login(client, "patient@cardiosentinel.demo")
+    info = client.get("/api/me/assistant", headers=hp).json()
+    assert info["mode"] == "offline" and info["suggestions"]
+    r = client.post("/api/me/assistant", headers=hp, json={"question": "When is my next appointment?"}).json()
+    assert r["mode"] == "offline" and any(s["kind"] == "appointment" for s in r["sources"])
+    assert client.post("/api/me/assistant", headers=hp, json={"question": "I have chest pain"}).json()["urgent"]
+    hc = login(client, "clinician@cardiosentinel.demo")
+    assert client.post("/api/me/assistant", headers=hc, json={"question": "hi"}).status_code == 403

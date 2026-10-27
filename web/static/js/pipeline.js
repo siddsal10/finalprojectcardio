@@ -57,11 +57,18 @@ export async function playPipeline(el, pl, { perClass, level, onDone, doneLabel 
 
   // 1 · reading
   const inp = pl.input || {};
-  let b = open(0, `<div class="pipe-facts">
+  const im = inp.image;
+  let b = open(0, im ? `<div class="pipe-facts">
+      ${inp.filename ? `<span class="chip">${icon("file")}${esc(inp.filename)}</span>` : ""}<span class="chip">${esc(inp.format)}</span>
+      ${inp.size_bytes ? `<span class="chip">${fileSize(inp.size_bytes)}</span>` : ""}<span class="chip">${esc(im.layout)} layout</span><span class="chip">${im.rows} rows traced</span></div>
+    <figure class="trace-photo"><img src="${esc(im.overlay)}" alt="Your ECG with the traced waveform drawn on top in colour"></figure>
+    <p class="small muted">The coloured lines are what we traced from your picture. If they do not follow the ECG, retake the photo or upload a scan.</p>
+    ${(im.notes || []).map((n) => `<p class="small">${icon("alert")} ${esc(n)}</p>`).join("")}` : `<div class="pipe-facts">
       ${inp.filename ? `<span class="chip">${icon("file")}${esc(inp.filename)}</span>` : ""}${inp.format && !String(inp.filename || "").startsWith(inp.format) ? `<span class="chip">${esc(inp.format)}</span>` : ""}
       ${inp.size_bytes ? `<span class="chip">${fileSize(inp.size_bytes)}</span>` : ""}<span class="chip">${inp.fs_in || 100} samples / second</span><span class="chip">${inp.duration_s || 10} seconds</span></div>
     <div class="leads">${(inp.leads || ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"]).map((l, i) => `<span style="animation-delay:${i * 70}ms">${esc(l)}</span>`).join("")}</div>
-    <p class="small muted">${inp.n_leads || 12} leads found${inp.bad_values_fixed ? ` · ${inp.bad_values_fixed} missing values repaired` : ""}.</p>`, pl.read_ms);
+    <p class="small muted">${inp.n_leads || 12} leads found${inp.bad_values_fixed ? ` · ${inp.bad_values_fixed} missing values repaired` : ""}.</p>`, (pl.read_ms || 0) + (im ? (pl.clean && pl.clean.ms) || 0 : 0));
+  if (im) await wait(1500);
   await wait(1500);
 
   // 2 · cleaning
@@ -69,7 +76,7 @@ export async function playPipeline(el, pl, { perClass, level, onDone, doneLabel 
   b = open(1, `<div class="grid g2" style="gap:14px;align-items:start">
       <ul class="ticks">${(cl.steps || []).map((s, i) => `<li style="animation-delay:${i * 260}ms">${icon("check")}${esc(s)}</li>`).join("")}</ul>
       <div class="trace-box">${cl.raw_ii ? `<div class="tiny muted">Lead II as uploaded</div><svg viewBox="0 0 600 90" preserveAspectRatio="none"><path class="draw raw" d="${tracePath(cl.raw_ii)}"/></svg>` : ""}
-        <div class="tiny muted">Lead II, cleaned</div><svg viewBox="0 0 600 90" preserveAspectRatio="none"><path class="draw clean" style="animation-delay:${cl.raw_ii ? 700 : 0}ms" d="${tracePath(cl.clean_ii)}"/></svg></div></div>`, (cl.ms || 0) + (pl.scale_ms || 0));
+        <div class="tiny muted">Lead II, ${im ? "traced from the picture" : "cleaned"}</div><svg viewBox="0 0 600 90" preserveAspectRatio="none"><path class="draw clean" style="animation-delay:${cl.raw_ii ? 700 : 0}ms" d="${tracePath(cl.clean_ii)}"/></svg></div></div>`, (cl.ms || 0) + (pl.scale_ms || 0));
   await wait(2000);
 
   // 3 · readers

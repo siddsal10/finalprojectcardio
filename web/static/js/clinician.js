@@ -1,11 +1,12 @@
 // Doctor workspace: what patients share, ECGs to review, patients, messages, appointments.
 import { api, get, patch, post } from "./api.js";
 import { mountEcg } from "./ecg.js";
+import { mountHeart } from "./heart3d.js";
 import { pipelineShell, playPipeline } from "./pipeline.js";
-import { bindThumbOpen, thumbsHtml } from "./patient.js";
+import { bindThumbOpen, downloadCsv, thumbsHtml } from "./patient.js";
 import {
   $, CLASSES, CLASS_NAMES, LEVELS, ago, date, dateTime, esc, findingChips, findingList, icon, initials, loading, modal,
-  moodFace, perClassFromPred, statusBadge, toast,
+  moodFace, perClassFromPred, pictureNotes, statusBadge, toast,
 } from "./ui.js";
 
 const shell = () => import("./app.js");
@@ -158,16 +159,20 @@ async function ecgDetail(el, { id }) {
   const lv = LEVELS[levelOfPred(pred)];
   el.innerHTML = `
     ${head("ECG", `${esc(p.name)} · ${esc(p.mrn)} · ${p.age ?? "–"} y · ${esc(p.sex || "")} · ${dateTime(e.recorded_at)}`,
-      `${statusBadge(e.status)}<a class="btn" href="#/report/${e.id}">${icon("printer")}Print</a>`,
+      `${statusBadge(e.status)}<button class="btn" id="csv">${icon("download")}Signal (CSV)</button><a class="btn" href="#/report/${e.id}">${icon("printer")}Print</a>`,
       `<a href="#/patients/${p.id}">${esc(p.name)}</a> / ECG`)}
     <div class="card" style="margin-bottom:18px"><div class="card-head" style="padding-bottom:12px"><div><h2>12-lead ECG</h2><p>${e.heart_rate ? `${Math.round(e.heart_rate)} bpm · ` : ""}${esc(e.indication || "")}</p></div></div><div id="ecg-view"></div></div>
+    ${pictureNotes(pred)}
     <div class="grid g-2-1">
       <div class="card"><div class="card-head"><div><h2>AI pre-read · ${lv.title}</h2><p>${pred.indeterminate.length ? `Unclear: ${pred.indeterminate.map((c) => esc(CLASS_NAMES[c])).join(", ")}` : "All five findings decided with high confidence"}</p></div>${levelBadge(pred)}</div>
         <div class="card-body flush" style="margin-top:8px">${findingList(perClassFromPred(pred))}</div></div>
+      <div class="card" style="grid-column:1/-1"><div class="card-head"><div><h2>Where on the heart</h2><p>Typical region of each AI finding (illustration, not imaging)</p></div></div><div class="card-body" id="heart3d"></div></div>
       <div class="card"><div class="card-head"><div><h2>${rev ? "Your review" : "Sign off"}</h2><p>${rev ? `${esc(rev.clinician_name)} · ${dateTime(rev.created_at)}` : "Confirm or correct the findings, then release to the patient."}</p></div></div>
         <div class="card-body" id="review-box"></div></div>
     </div>`;
   mountEcg($("#ecg-view"), await get(`/api/ecgs/${id}/signal`));
+  mountHeart($("#heart3d"), { perClass: perClassFromPred(pred), bpm: e.heart_rate || 72 });
+  $("#csv").addEventListener("click", () => downloadCsv(id));
   const box = $("#review-box");
   const init = rev ? rev.final_labels : pred.decisions;
   box.innerHTML = `
@@ -206,7 +211,7 @@ async function analyze(el) {
     <div class="grid g-1-2">
       <div class="card" style="align-self:start"><div class="card-body">
         <div class="field"><label>Patient</label><select class="input" id="pt"><option value="">Preview only, don't save</option>${pts.map((p) => `<option value="${p.id}" ${String(p.id) === pre ? "selected" : ""}>${esc(p.name)} · ${esc(p.mrn)}</option>`).join("")}</select></div>
-        <div class="dropzone" id="dz">${icon("upload")}<p style="margin:8px 0 2px"><b>Drop ECG files here</b> or click</p><p class="muted small">CSV, NPY or WFDB (.hea + .dat)</p><input type="file" id="file" multiple hidden accept=".npy,.csv,.txt,.hea,.dat"></div>
+        <div class="dropzone" id="dz">${icon("upload")}<p style="margin:8px 0 2px"><b>Drop ECG files here</b> or click</p><p class="muted small">Photo / scan / PDF of a printed 12-lead ECG, or CSV, NPY, WFDB (.hea + .dat)</p><input type="file" id="file" multiple hidden accept=".npy,.csv,.txt,.hea,.dat,.png,.jpg,.jpeg,.webp,.pdf"></div>
         <div id="file-list" class="small" style="margin-top:10px"></div>
         <div class="field" style="margin-top:12px"><label>Sampling rate (Hz)</label><input class="input" id="fs" type="number" value="100"></div>
         <button class="btn primary" id="run" style="width:100%;justify-content:center">${icon("heart")}Analyze</button>

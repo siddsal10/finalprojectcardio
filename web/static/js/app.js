@@ -13,6 +13,7 @@ const NAV = {
     { href: "#/home", icon: "heart", text: "Home" },
     { href: "#/check", icon: "activity", text: "Check my heart" },
     { href: "#/results", icon: "file", text: "My results" },
+    { href: "#/ask", icon: "mic", text: "Ask about my heart" },
     { href: "#/journal", icon: "smile", text: "How I feel" },
     { href: "#/doctor", icon: "stethoscope", text: "My doctor", count: "doctor" },
     { href: "#/appointments", icon: "calendar", text: "Appointments" },
@@ -57,11 +58,11 @@ function renderLanding() {
   root.innerHTML = `<div class="site">${siteNav()}
     <section class="hero">
       <div>
-        <span class="badge info">${icon("heart")}Heart check from your ECG</span>
-        <h1 style="margin-top:16px">Spot early <em>warning signs</em> on your ECG.</h1>
-        <p class="lead">Upload your ECG and get an easy-to-understand heart check in seconds. Keep track of how you feel, and share everything with your doctor when you choose to.</p>
-        <div class="row"><a class="btn brand lg" href="#/signup">Check my heart, free</a><a class="btn lg" href="#/login">I have an account</a></div>
-        <div class="trust"><span>${icon("checkCircle")}Results in seconds</span><span>${icon("lock")}Private until you share</span><span>${icon("stethoscope")}Your doctor stays in the loop</span></div>
+        <span class="hero-eyebrow">12-lead ECG · file, photo or scan</span>
+        <h1>Four models.<br>One <em>gated</em> read.</h1>
+        <p class="lead">Upload your ECG, or just a photo of the paper printout, and get a clear heart check in seconds: five findings, each found, not found or unclear, and a 3-D heart that shows where they come from.</p>
+        <div class="row"><a class="btn brand lg" href="#/signup">Check my heart</a><a class="btn lg" href="#how">How it works</a></div>
+        <div class="stat-row"><div><b>5</b>Findings checked</div><div><b>4</b>AI readers</div><div><b>0.94 / 0.91</b>Precision / recall on auto-reports</div></div>
       </div>
       <div class="hero-card">
         <div class="hero-status good" style="box-shadow:none"><div class="eyebrow">Your heart check · today</div><h2>No warning signs found</h2><p>Your ECG looks typical for the five things we check.</p>
@@ -70,17 +71,19 @@ function renderLanding() {
         <div class="row between" style="padding:6px 6px 0"><span class="small muted">Shared with Dr. Rao</span><span class="badge good">${icon("message")}Doctor replied</span></div>
       </div>
     </section>
-    <section class="section">
-      <h2 class="big">How it works</h2><p class="sub">Three steps, no medical jargon.</p>
-      <div class="grid g3">
-        ${[["upload", "info", "1. Add your ECG", "Upload the ECG file from your clinic or device. No ECG? Try it with an example recording."],
-          ["activity", "crit", "2. Get your heart check", "In seconds you see five clear results, from a normal pattern to signs of a heart attack, each marked found, not found or unclear."],
-          ["share", "good", "3. Share with your doctor", "You decide what to send: the check, how you've been feeling, photos or documents. Your doctor replies here."]]
+    <section class="section" id="how">
+      <span class="hero-eyebrow">How it works</span>
+      <h2 class="big">Three steps. No jargon.</h2><p class="sub">From a file or a photo of your printout to a result you can share.</p>
+      <div class="grid g3 steps-line">
+        ${[["camera", "info", "Add your ECG", "Upload the file from your clinic or device, or photograph the paper printout. We trace the waveform and show you the tracing."],
+          ["activity", "crit", "Get your heart check", "Four AI readers vote and a gate combines them. Five findings, each found, not found or unclear, with a 3-D heart showing where."],
+          ["share", "good", "Share with your doctor", "You decide what to send: the check, how you've been feeling, photos or documents. Your doctor replies here."]]
           .map(([i, t, h, p]) => `<div class="card feature"><div class="kpi-icon" style="background:var(--${t}-soft);color:var(--${t})">${icon(i)}</div><h3>${h}</h3><p>${p}</p></div>`).join("")}
       </div>
     </section>
     <section class="section" style="padding-top:10px">
-      <h2 class="big">What we check</h2><p class="sub">Five early warning signs that can show up on a 12-lead ECG, plus how you feel.</p>
+      <span class="hero-eyebrow">What we check</span>
+      <h2 class="big">Five warning signs.</h2><p class="sub">Patterns that can show up on a 12-lead ECG, plus how you feel.</p>
       <div class="grid g3">
         ${[["heart", "good", "Normal ECG pattern", "Whether your heart's electrical activity looks typical."],
           ["alert", "crit", "Signs of a heart attack", "Patterns that can appear during or after a heart attack, even an old one that went unnoticed."],
@@ -92,12 +95,12 @@ function renderLanding() {
       </div>
     </section>
     <section class="section" style="padding-top:10px">
-      <div class="band"><div><h2>Your data, your choice.</h2><p>Your heart checks and notes stay private. Nothing reaches your doctor until you press "Share".</p></div><a class="btn lg" style="background:#fff;color:#1c1f4a;border-color:#fff" href="#/signup">Create my free account</a></div>
+      <div class="band"><div><h2>Your data, your choice.</h2><p>Your heart checks and notes stay private. Nothing reaches your doctor until you press "Share".</p></div><a class="btn brand lg" href="#/signup">Create my free account</a></div>
     </section>
     <footer class="site-foot">CardioSentinel gives an AI pre-read of your ECG. It is not a diagnosis and does not replace your doctor. It cannot rule out a heart attack or predict cardiac arrest. <b>If you have chest pain, fainting or severe breathlessness, call your local emergency number now.</b></footer>
   </div>`;
   $("#theme-btn").addEventListener("click", toggleTheme);
-  mountMonitor($("#hero-mon"), { bpm: 72, color: "#ff6b8a", height: 96, onBeat: bpmPulse($("#hero-bpm")) });
+  mountMonitor($("#hero-mon"), { bpm: 72, color: "#c8102e", height: 96, onBeat: bpmPulse($("#hero-bpm")) });
 }
 
 function renderAuth(mode, err = "") {
