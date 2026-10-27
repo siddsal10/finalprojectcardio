@@ -25,8 +25,9 @@ images:
     eval_batch_size: 128
   real:                            # ECG-Image-Database, PTB-XL part (D0): real scans and photos
     dir: data/raw/ecg_image_db/D0
-    train_images_per_fold: 13      # ~100 real training pictures over folds 1-8 (each client: its own 2 folds)
-    val_images: 60                 # real fold-9 pictures: early stopping, temperature, gate, thresholds, triage
+    train_images_per_fold: 125     # ~1,000 real training pictures over folds 1-8 (each client: its own 2 folds);
+                                   # was 13 (~100) until 2026-10-27, previous models in git commit 6f8b6c5
+    val_images: 300                # real fold-9 pictures: early stopping, temperature, gate, thresholds, triage (was 60)
     dev_fold: 9                    # looked at while developing the digitizer
     test_fold: 10                  # evaluated once (images/evaluate.py refuses a rerun without --rerun)
     test_images: 100               # real fold-10 pictures in the test

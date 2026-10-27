@@ -5,12 +5,12 @@
     1,
     2
   ],
-  "n_train_real_pictures": 26,
+  "n_train_real_pictures": 249,
   "real_weight": 2,
   "n_train_synthetic": 0,
-  "n_val_real_pictures": 59,
+  "n_val_real_pictures": 298,
   "init": "signal client",
-  "temperature": 4.16104793548584,
-  "best_val_macro_auroc": 0.8795354015680695,
+  "temperature": 2.4303128719329834,
+  "best_val_macro_auroc": 0.8606896596190726,
   "epochs_run": 5
 }

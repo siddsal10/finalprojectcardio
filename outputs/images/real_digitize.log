@@ -18,3 +18,12 @@
 {"fold": 8, "images": 13, "records": 12, "digitized": 1.0, "median_r": 0.32346968375027046}
 {"fold": 9, "images": 60, "records": 45, "digitized": 0.9833333333333333, "median_r": 0.24766904069298126}
 {"fold": 10, "images": 100, "records": 62, "digitized": 0.98, "median_r": 0.29936939326715345}
+{"fold": 1, "images": 125, "records": 62, "digitized": 0.992, "median_r": 0.26200576824011573}
+{"fold": 2, "images": 125, "records": 60, "digitized": 1.0, "median_r": 0.30393325499425655}
+{"fold": 3, "images": 125, "records": 73, "digitized": 0.992, "median_r": 0.22256676900123457}
+{"fold": 4, "images": 125, "records": 63, "digitized": 0.992, "median_r": 0.21046438539270895}
+{"fold": 5, "images": 125, "records": 71, "digitized": 0.984, "median_r": 0.276607980542344}
+{"fold": 6, "images": 125, "records": 73, "digitized": 1.0, "median_r": 0.2809995042835479}
+{"fold": 7, "images": 125, "records": 64, "digitized": 1.0, "median_r": 0.25148575203170137}
+{"fold": 8, "images": 125, "records": 71, "digitized": 1.0, "median_r": 0.26072015602705007}
+{"fold": 9, "images": 300, "records": 86, "digitized": 0.9933333333333333, "median_r": 0.25328698386985804}

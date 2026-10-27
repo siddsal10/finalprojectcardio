@@ -416,3 +416,41 @@ were run for the testing chapter: 37 passed.
 **Left for the authors.** Guide name and designation, Head of Department, department and programme name stay as the
 template's highlighted placeholders. The certificate says Fall Semester 2026-2027. The contents table is static text,
 and Word may paginate slightly differently from LibreOffice, so check its page numbers after any edit in Word.
+
+---
+
+## Image clients fine-tuned on ~1,000 real photos (2026-10-27)
+
+**Owner decision (2026-10-27):** use more of ECG-Image-Database (PTB-XL part, D0): ~1,000 real training pictures
+instead of ~100, and re-run the fold-10 photo test once (`--rerun`) on the **same 100 pictures** so it is comparable.
+`configs/images.yaml`: `train_images_per_fold` 13 -> 125, `val_images` 60 -> 300. Previous models and test tables are in git
+commit 6f8b6c5 (and locally in `outputs/images/archive_104photos/`, not committed). Digitizing ran with 3 workers (8 workers ran out of the machine's 8 GB RAM).
+
+**Data:** 998 training pictures (each client ~249 of its own 2 folds, x2 weight), 298 fold-9 pictures; 99.5% digitized.
+
+| Client | Fold-9 photo AUROC, 104 -> 1,000 pictures |
+|---|---|
+| A (CNN) | 0.880 -> 0.861 |
+| B (ResNet) | 0.824 -> 0.878 |
+| C (BiLSTM) | 0.762 -> 0.808 |
+| D (CNN-LSTM) | 0.897 -> 0.894 |
+
+Gate: equal weights selected (fold-9 CV AUROC equal 0.906, static 0.885, dynamic 0.870); previously static (~all on D).
+
+**Real fold-10 photos (same 100 photos, 62 records, seed 42, second run):**
+
+| Model | Macro AUROC (95% CI) | Macro AUPRC | Macro F1 | Precision | Recall | Exact match |
+|---|---|---|---|---|---|---|
+| Image gate, 1,000 pictures | 0.890 (0.830-0.941) | 0.769 | 0.584 | 0.480 | 0.834 | 0.398 |
+| Image gate, 104 pictures (before) | 0.841 (0.746-0.916) | 0.710 | 0.558 | 0.572 | 0.700 | 0.388 |
+| Signal gate on digitized photos (no fine-tuning) | 0.859 (0.792-0.919) | 0.707 | 0.343 | - | 0.532 | 0.082 |
+| Signal gate on recorded signal (reference) | 0.946 (0.906-0.975) | 0.808 | 0.696 | 0.684 | 0.745 | 0.684 |
+
+More real pictures raised the image gate's AUROC by 0.049 (now above the untuned signal gate on the same photos) and
+recall, at lower precision (thresholds fitted for F1 on fold 9). The gap to the recorded signal (0.946) is the digitizer.
+
+**Triage on photos:** 58.6% of findings auto-decided (was 50.0%), accuracy 0.930; 25.5% of photos fully automatic
+(was 10.2%). MI and CD are now rule-out only. Automated NORM (P/R 0.84/0.87) and STTC (0.80/0.80) are still below the 0.90
+target, so `images.auto_report` stays `false`: the portal keeps referring every photo finding to a doctor.
+
+**Caveat:** this is a second look at the same 100 fold-10 photos, approved by the owner; nothing was tuned on them.
