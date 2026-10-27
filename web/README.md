@@ -116,11 +116,14 @@ Patients ask out loud (browser speech recognition) or type, and hear the answer 
 retrieves the closest of the patient's own records (heart checks, doctor reviews, journal, messages, appointments,
 shares, profile; TF-IDF) and an LLM answers only from them, citing the records used. The LLM runs through OpenRouter:
 
+Put the key in `web/.env` (git-ignored), which `server.py` loads at startup:
+
 ```bash
-set OPENROUTER_API_KEY=sk-or-...          # PowerShell: $env:OPENROUTER_API_KEY="sk-or-..."
-set OPENROUTER_MODEL=openrouter/auto      # optional: any OpenRouter model id
-python web/server.py
+OPENROUTER_API_KEY=sk-or-...
+OPENROUTER_MODEL=openrouter/auto          # optional: any OpenRouter model id
 ```
+
+Variables already set in the shell take precedence over `web/.env`.
 
 Without a key it answers offline by reading the matching records back. It never sees other patients' data, flags
 emergency words with "call your local emergency number" and does not diagnose.

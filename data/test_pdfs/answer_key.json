@@ -1,0 +1,599 @@
+[
+  {
+    "base": "ecg_1246_NORM",
+    "ecg_id": 1246,
+    "truth": [
+      "NORM"
+    ],
+    "results": {
+      "signal": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [],
+        "probs": {
+          "NORM": 0.877,
+          "MI": 0.255,
+          "STTC": 0.033,
+          "CD": 0.106,
+          "HYP": 0.108
+        }
+      },
+      ".csv": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [],
+        "probs": {
+          "NORM": 0.874,
+          "MI": 0.262,
+          "STTC": 0.035,
+          "CD": 0.109,
+          "HYP": 0.108
+        }
+      },
+      ".pdf": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.674,
+          "MI": 0.378,
+          "STTC": 0.096,
+          "CD": 0.363,
+          "HYP": 0.277
+        }
+      },
+      ".png": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.708,
+          "MI": 0.452,
+          "STTC": 0.083,
+          "CD": 0.223,
+          "HYP": 0.174
+        }
+      },
+      "_photo.jpg": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.636,
+          "MI": 0.466,
+          "STTC": 0.089,
+          "CD": 0.323,
+          "HYP": 0.252
+        }
+      }
+    }
+  },
+  {
+    "base": "ecg_16712_MI",
+    "ecg_id": 16712,
+    "truth": [
+      "MI"
+    ],
+    "results": {
+      "signal": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [
+          "NORM",
+          "MI"
+        ],
+        "probs": {
+          "NORM": 0.774,
+          "MI": 0.409,
+          "STTC": 0.033,
+          "CD": 0.093,
+          "HYP": 0.177
+        }
+      },
+      ".csv": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [
+          "NORM",
+          "MI"
+        ],
+        "probs": {
+          "NORM": 0.755,
+          "MI": 0.427,
+          "STTC": 0.041,
+          "CD": 0.092,
+          "HYP": 0.192
+        }
+      },
+      ".pdf": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.694,
+          "MI": 0.451,
+          "STTC": 0.105,
+          "CD": 0.191,
+          "HYP": 0.22
+        }
+      },
+      ".png": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.679,
+          "MI": 0.477,
+          "STTC": 0.113,
+          "CD": 0.147,
+          "HYP": 0.232
+        }
+      },
+      "_photo.jpg": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.663,
+          "MI": 0.489,
+          "STTC": 0.103,
+          "CD": 0.213,
+          "HYP": 0.231
+        }
+      }
+    }
+  },
+  {
+    "base": "ecg_13238_STTC",
+    "ecg_id": 13238,
+    "truth": [
+      "STTC"
+    ],
+    "results": {
+      "signal": {
+        "positive": [
+          "STTC"
+        ],
+        "referred": [
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.198,
+          "MI": 0.258,
+          "STTC": 0.855,
+          "CD": 0.224,
+          "HYP": 0.566
+        }
+      },
+      ".csv": {
+        "positive": [
+          "STTC"
+        ],
+        "referred": [
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.196,
+          "MI": 0.259,
+          "STTC": 0.857,
+          "CD": 0.226,
+          "HYP": 0.572
+        }
+      },
+      ".pdf": {
+        "positive": [
+          "NORM",
+          "STTC"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.398,
+          "MI": 0.62,
+          "STTC": 0.5,
+          "CD": 0.266,
+          "HYP": 0.313
+        }
+      },
+      ".png": {
+        "positive": [
+          "NORM",
+          "STTC"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.434,
+          "MI": 0.576,
+          "STTC": 0.496,
+          "CD": 0.263,
+          "HYP": 0.329
+        }
+      },
+      "_photo.jpg": {
+        "positive": [
+          "NORM",
+          "STTC"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.376,
+          "MI": 0.649,
+          "STTC": 0.504,
+          "CD": 0.365,
+          "HYP": 0.316
+        }
+      }
+    }
+  },
+  {
+    "base": "ecg_9562_CD",
+    "ecg_id": 9562,
+    "truth": [
+      "CD"
+    ],
+    "results": {
+      "signal": {
+        "positive": [
+          "CD"
+        ],
+        "referred": [
+          "MI",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.033,
+          "MI": 0.331,
+          "STTC": 0.271,
+          "CD": 0.954,
+          "HYP": 0.464
+        }
+      },
+      ".csv": {
+        "positive": [
+          "CD"
+        ],
+        "referred": [
+          "MI",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.034,
+          "MI": 0.355,
+          "STTC": 0.274,
+          "CD": 0.951,
+          "HYP": 0.457
+        }
+      },
+      ".pdf": {
+        "positive": [
+          "STTC",
+          "CD"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.073,
+          "MI": 0.516,
+          "STTC": 0.668,
+          "CD": 0.855,
+          "HYP": 0.617
+        }
+      },
+      ".png": {
+        "positive": [
+          "STTC",
+          "CD"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.07,
+          "MI": 0.573,
+          "STTC": 0.721,
+          "CD": 0.808,
+          "HYP": 0.678
+        }
+      },
+      "_photo.jpg": {
+        "positive": [
+          "STTC",
+          "CD"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.056,
+          "MI": 0.589,
+          "STTC": 0.719,
+          "CD": 0.833,
+          "HYP": 0.709
+        }
+      }
+    }
+  },
+  {
+    "base": "ecg_7354_HYP",
+    "ecg_id": 7354,
+    "truth": [
+      "HYP"
+    ],
+    "results": {
+      "signal": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [
+          "NORM",
+          "STTC",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.683,
+          "MI": 0.092,
+          "STTC": 0.415,
+          "CD": 0.096,
+          "HYP": 0.416
+        }
+      },
+      ".csv": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [
+          "NORM",
+          "STTC",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.666,
+          "MI": 0.098,
+          "STTC": 0.442,
+          "CD": 0.095,
+          "HYP": 0.418
+        }
+      },
+      ".pdf": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.497,
+          "MI": 0.262,
+          "STTC": 0.476,
+          "CD": 0.183,
+          "HYP": 0.593
+        }
+      },
+      ".png": {
+        "positive": [
+          "NORM",
+          "STTC"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.414,
+          "MI": 0.269,
+          "STTC": 0.551,
+          "CD": 0.182,
+          "HYP": 0.671
+        }
+      },
+      "_photo.jpg": {
+        "positive": [
+          "NORM"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.549,
+          "MI": 0.221,
+          "STTC": 0.431,
+          "CD": 0.271,
+          "HYP": 0.537
+        }
+      }
+    }
+  },
+  {
+    "base": "ecg_18019_MI_STTC",
+    "ecg_id": 18019,
+    "truth": [
+      "MI",
+      "STTC"
+    ],
+    "results": {
+      "signal": {
+        "positive": [
+          "MI"
+        ],
+        "referred": [
+          "STTC",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.022,
+          "MI": 0.976,
+          "STTC": 0.401,
+          "CD": 0.13,
+          "HYP": 0.214
+        }
+      },
+      ".csv": {
+        "positive": [
+          "MI"
+        ],
+        "referred": [
+          "STTC",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.022,
+          "MI": 0.976,
+          "STTC": 0.399,
+          "CD": 0.13,
+          "HYP": 0.213
+        }
+      },
+      ".pdf": {
+        "positive": [
+          "MI",
+          "STTC"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.08,
+          "MI": 0.888,
+          "STTC": 0.532,
+          "CD": 0.254,
+          "HYP": 0.511
+        }
+      },
+      ".png": {
+        "positive": [
+          "MI",
+          "STTC"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.097,
+          "MI": 0.85,
+          "STTC": 0.58,
+          "CD": 0.24,
+          "HYP": 0.536
+        }
+      },
+      "_photo.jpg": {
+        "positive": [
+          "MI",
+          "STTC"
+        ],
+        "referred": [
+          "NORM",
+          "MI",
+          "STTC",
+          "CD",
+          "HYP"
+        ],
+        "probs": {
+          "NORM": 0.07,
+          "MI": 0.891,
+          "STTC": 0.544,
+          "CD": 0.322,
+          "HYP": 0.538
+        }
+      }
+    }
+  }
+]
