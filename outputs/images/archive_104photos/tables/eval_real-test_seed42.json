@@ -1,0 +1,301 @@
+{
+  "set": "real-test",
+  "seed": 42,
+  "n_images": 100,
+  "n_records": 62,
+  "coverage": 0.98,
+  "median_r": 0.29936939326715345,
+  "models": [
+    {
+      "model": "Image gate (fine-tuned)",
+      "macro_auroc": 0.8405595401730148,
+      "ci_low": 0.7459667060968063,
+      "ci_high": 0.9162676260635492,
+      "macro_auprc": 0.7104644776286421,
+      "macro_f1": 0.557873294788173,
+      "macro_precision": 0.5718998932413566,
+      "macro_recall": 0.6999880157507277,
+      "labelwise_accuracy": 0.7979591836734694,
+      "exact_match": 0.3877551020408163
+    },
+    {
+      "model": "Image client A",
+      "macro_auroc": 0.8408517817758968,
+      "ci_low": 0.7636821031018818,
+      "ci_high": 0.9051953611440977,
+      "macro_auprc": 0.6820895184625579,
+      "macro_f1": 0.543240822752134,
+      "macro_precision": 0.47574943944857245,
+      "macro_recall": 0.7727478171545967,
+      "labelwise_accuracy": 0.7183673469387755,
+      "exact_match": 0.19387755102040816
+    },
+    {
+      "model": "Image client B",
+      "macro_auroc": 0.8412142107150664,
+      "ci_low": 0.7773499875397039,
+      "ci_high": 0.903246944794436,
+      "macro_auprc": 0.6849923195805978,
+      "macro_f1": 0.5622856780963386,
+      "macro_precision": 0.5299234149403641,
+      "macro_recall": 0.780768703989043,
+      "labelwise_accuracy": 0.7081632653061225,
+      "exact_match": 0.20408163265306123
+    },
+    {
+      "model": "Image client C",
+      "macro_auroc": 0.778067536207958,
+      "ci_low": 0.7019691359220035,
+      "ci_high": 0.8452258214297881,
+      "macro_auprc": 0.5198643653988778,
+      "macro_f1": 0.44642204299637706,
+      "macro_precision": 0.35241565808713415,
+      "macro_recall": 0.7647800034240713,
+      "labelwise_accuracy": 0.689795918367347,
+      "exact_match": 0.16326530612244897
+    },
+    {
+      "model": "Image client D",
+      "macro_auroc": 0.8405595401730148,
+      "ci_low": 0.7459667060968063,
+      "ci_high": 0.9162676260635492,
+      "macro_auprc": 0.7104644776286421,
+      "macro_f1": 0.557873294788173,
+      "macro_precision": 0.5718998932413566,
+      "macro_recall": 0.6999880157507277,
+      "labelwise_accuracy": 0.7979591836734694,
+      "exact_match": 0.3877551020408163
+    },
+    {
+      "model": "Signal gate on digitized signal (no fine-tuning)",
+      "macro_auroc": 0.8586016770528035,
+      "ci_low": 0.7917513735130859,
+      "ci_high": 0.9193525639032696,
+      "macro_auprc": 0.7071057462553265,
+      "macro_f1": 0.3428731634068921,
+      "macro_precision": NaN,
+      "macro_recall": 0.5323232323232323,
+      "labelwise_accuracy": 0.6122448979591837,
+      "exact_match": 0.08163265306122448
+    },
+    {
+      "model": "Signal gate on recorded signal (reference)",
+      "macro_auroc": 0.945894759690737,
+      "ci_low": 0.9061519127215507,
+      "ci_high": 0.9754646085494256,
+      "macro_auprc": 0.8078081436716428,
+      "macro_f1": 0.6958225937536283,
+      "macro_precision": 0.6837426900584795,
+      "macro_recall": 0.7447115219996576,
+      "labelwise_accuracy": 0.8979591836734694,
+      "exact_match": 0.6836734693877551
+    }
+  ],
+  "per_capture": [
+    {
+      "capture": "colour scan",
+      "images": 20,
+      "digitized": 1.0,
+      "median_r": 0.4406322384897111,
+      "auroc_image_gate": 0.6076270221007063,
+      "auroc_signal_gate_digitized": 0.7055422647527911,
+      "auroc_reference": 0.8180489101541732
+    },
+    {
+      "capture": "digital (green grid)",
+      "images": 10,
+      "digitized": 1.0,
+      "median_r": 0.17690295222849203
+    },
+    {
+      "capture": "digital (red grid)",
+      "images": 10,
+      "digitized": 1.0,
+      "median_r": 0.778149810960064
+    },
+    {
+      "capture": "grayscale scan",
+      "images": 20,
+      "digitized": 1.0,
+      "median_r": 0.19123551091101043,
+      "auroc_image_gate": 0.8712428507165348,
+      "auroc_signal_gate_digitized": 0.8707801555169977,
+      "auroc_reference": 0.963991388728231
+    },
+    {
+      "capture": "phone photo",
+      "images": 10,
+      "digitized": 0.8,
+      "median_r": 0.3400102225194633
+    },
+    {
+      "capture": "phone photo, stained",
+      "images": 10,
+      "digitized": 1.0,
+      "median_r": -0.0038084336809755997
+    },
+    {
+      "capture": "photo of a monitor",
+      "images": 10,
+      "digitized": 1.0,
+      "median_r": 0.3364822056168099
+    },
+    {
+      "capture": "scan, stained",
+      "images": 10,
+      "digitized": 1.0,
+      "median_r": 0.11856508871606863
+    }
+  ],
+  "per_class_image_gate": {
+    "NORM": {
+      "auroc": 0.8591916558018253,
+      "precision": 0.7916666666666666,
+      "recall": 0.9661016949152542,
+      "specificity": 0.6153846153846154,
+      "f1": 0.8702290076335878,
+      "accuracy": 0.826530612244898,
+      "threshold": 0.13999999999999999
+    },
+    "MI": {
+      "auroc": 0.7480769230769231,
+      "precision": 0.3939393939393939,
+      "recall": 0.65,
+      "specificity": 0.7435897435897436,
+      "f1": 0.490566037735849,
+      "accuracy": 0.7244897959183674,
+      "threshold": 0.76
+    },
+    "STTC": {
+      "auroc": 0.8751560549313359,
+      "precision": 0.25925925925925924,
+      "recall": 0.7777777777777778,
+      "specificity": 0.7752808988764045,
+      "f1": 0.3888888888888889,
+      "accuracy": 0.7755102040816326,
+      "threshold": 0.48000000000000004
+    },
+    "CD": {
+      "auroc": 0.8163875598086124,
+      "precision": 0.4146341463414634,
+      "recall": 0.7727272727272727,
+      "specificity": 0.6842105263157895,
+      "f1": 0.5396825396825397,
+      "accuracy": 0.7040816326530612,
+      "threshold": 0.54
+    },
+    "HYP": {
+      "auroc": 0.9039855072463768,
+      "precision": 1.0,
+      "recall": 0.3333333333333333,
+      "specificity": 1.0,
+      "f1": 0.5,
+      "accuracy": 0.9591836734693877,
+      "threshold": 0.7200000000000001
+    }
+  },
+  "triage_image_gate": {
+    "summary": {
+      "automated_classes": [
+        "NORM",
+        "MI",
+        "STTC",
+        "CD",
+        "HYP"
+      ],
+      "rule_out_classes": [],
+      "review_classes": [],
+      "macro_precision_automated": 0.8727777777777778,
+      "macro_recall_automated": 0.8117562724014336,
+      "macro_accuracy_automated": 0.9378825136612022,
+      "macro_coverage_automated": 0.5,
+      "finding_coverage": 0.5,
+      "finding_accuracy": 0.9428571428571428,
+      "ecg_fully_automated": 0.10204081632653061,
+      "ecg_fully_automated_exact_match": 0.9,
+      "n": 98
+    },
+    "per_class": {
+      "NORM": {
+        "mode": "automated",
+        "tp": 28,
+        "fp": 4,
+        "fn": 3,
+        "tn": 26,
+        "coverage": 0.6224489795918368,
+        "precision": 0.875,
+        "recall": 0.9032258064516129,
+        "accuracy": 0.8852459016393442,
+        "npv": 0.896551724137931,
+        "specificity": 0.8666666666666667,
+        "positive_auto": 0.4745762711864407,
+        "positive_ruled_out": 0.05084745762711865
+      },
+      "MI": {
+        "mode": "automated",
+        "tp": 3,
+        "fp": 2,
+        "fn": 2,
+        "tn": 33,
+        "coverage": 0.40816326530612246,
+        "precision": 0.6,
+        "recall": 0.6,
+        "accuracy": 0.9,
+        "npv": 0.9428571428571428,
+        "specificity": 0.9428571428571428,
+        "positive_auto": 0.15,
+        "positive_ruled_out": 0.1
+      },
+      "STTC": {
+        "mode": "automated",
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "tn": 37,
+        "coverage": 0.40816326530612246,
+        "precision": 1.0,
+        "recall": 1.0,
+        "accuracy": 1.0,
+        "npv": 1.0,
+        "specificity": 1.0,
+        "positive_auto": 0.3333333333333333,
+        "positive_ruled_out": 0.0
+      },
+      "CD": {
+        "mode": "automated",
+        "tp": 8,
+        "fp": 1,
+        "fn": 1,
+        "tn": 14,
+        "coverage": 0.24489795918367346,
+        "precision": 0.8888888888888888,
+        "recall": 0.8888888888888888,
+        "accuracy": 0.9166666666666666,
+        "npv": 0.9333333333333333,
+        "specificity": 0.9333333333333333,
+        "positive_auto": 0.36363636363636365,
+        "positive_ruled_out": 0.045454545454545456
+      },
+      "HYP": {
+        "mode": "automated",
+        "tp": 2,
+        "fp": 0,
+        "fn": 1,
+        "tn": 77,
+        "coverage": 0.8163265306122449,
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "accuracy": 0.9875,
+        "npv": 0.9871794871794872,
+        "specificity": 1.0,
+        "positive_auto": 0.3333333333333333,
+        "positive_ruled_out": 0.16666666666666666
+      }
+    }
+  },
+  "failures": {
+    "found # rows of traces": 1,
+    "could not follow the trace in row #": 1
+  },
+  "selected_combiner": "static"
+}
