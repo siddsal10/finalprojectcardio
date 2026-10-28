@@ -255,6 +255,8 @@ def asset(ref: str, shots: Path) -> Path:
         if not p.exists():
             diagrams.render(name, diagrams.DIAGRAMS[name], BUILD / "diagrams")
         return p
+    if kind == "paperfig" and Path(name).suffix:      # image file used as-is (e.g. confusion_clients.jpg)
+        return PAPER / "figures" / name
     if kind == "paperfig":
         p = BUILD / "figures" / f"{name}.png"
         if not p.exists():

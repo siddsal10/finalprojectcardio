@@ -1,0 +1,32 @@
+\section{Conclusion and Future Work}
+\label{sec:conclusion}
+
+This paper presented CardioSentinel, a privacy-preserving, one-shot federated model for the multi-label
+classification of 12-lead ECGs into the five PTB-XL diagnostic superclasses. Four clients trained a
+1D CNN, a 1D ResNet, a BiLSTM and a CNN-LSTM on disjoint, patient-separated quarters of the training
+data, calibrated them, and shared only their class probabilities with a server that combines them on
+the probability simplex. A parsimony-first selection on patient-grouped validation predictions chose
+equal weighting over learned static weights and a per-patient dynamic gate in all three seeds. On the
+untouched test fold the federated model reached a macro AUROC of 0.905 $\pm$ 0.000, a macro F1 of
+70.7\% and a label-wise accuracy of 86.9\%, improved on the best single client in every seed
+(+0.009 to +0.012 AUROC, paired bootstrap), and came within 0.004 AUROC of a model trained on all
+data pooled together while matching its macro F1. It outperformed every model trainable at a single
+site, including hand-crafted-feature XGBoost, whereas FedAvg with a shared CNN-LSTM was 0.002 AUROC
+better after 20 rounds and pooled-data XGBoost 0.004 better; the proposed scheme therefore trades a small
+loss in accuracy for a single communication round and a free choice of architecture. Client-subset ablations and Shapley values showed
+that every institution contributes, which is why equal weighting outperformed learned weights that
+discard the weaker clients. Integrated Gradients attributed the predictions to leads and waveform
+segments, and per-finding triage bands automated 53.7\% of the findings at a precision of 0.937 and an
+accuracy of 0.967 while referring the remainder to a cardiologist.
+
+Future work will follow four directions. First, the method will be evaluated on genuinely
+heterogeneous institutions with different devices, populations and label distributions, where the
+diversity of the clients and the need for a learned gate are expected to be larger. Second, a client
+trained on hand-crafted amplitude features, such as the XGBoost model that reached 0.909 AUROC on pooled
+data, will be added to the federation, and the parameter-averaging baselines will be repeated over
+several seeds and with longer training. Third, the gate will receive inputs that actually differ between
+clients, such as additional modalities or site metadata, so that per-patient weighting can become
+informative, and formal guarantees such as differential privacy on the shared probabilities will be
+studied. Fourth, the recognition of hypertrophy will be improved, for example by restoring absolute
+voltage information that per-recording normalisation removes, and the explanations will be validated
+with cardiologists.

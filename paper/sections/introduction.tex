@@ -1,0 +1,83 @@
+\section{Introduction}
+\label{sec:intro}
+
+\IEEEPARstart{C}{ardiovascular} diseases remain the leading cause of death worldwide, and the
+Global Burden of Disease study estimated that their prevalence has almost doubled between 1990
+and 2019 \cite{roth2020gbd}. The 12-lead electrocardiogram (ECG) is the first-line, low-cost and
+non-invasive test for most of these conditions: it is recorded in primary care, emergency
+departments and wards, and a single ten-second recording can reveal myocardial infarction (MI),
+ischaemic ST/T changes (STTC), conduction disturbances (CD) and ventricular hypertrophy (HYP).
+Because a large fraction of ECGs is acquired where no cardiologist is present, reliable automatic
+interpretation directly affects how quickly a patient with an acute finding is identified and
+referred.
+
+\textit{Problem definition.} In current practice the ECG is interpreted visually by a physician,
+often supported by rule-based software built into the electrocardiograph. Visual reading is
+subjective and depends on training and workload, and the built-in algorithms are known to produce
+frequent errors, especially for non-sinus rhythms and subtle morphological changes, so their
+statements have to be over-read by an expert \cite{schlapfer2017}. A single ECG can, moreover,
+carry several co-existing diagnoses, which makes the task inherently multi-label rather than a
+choice between mutually exclusive classes. In this work the problem is therefore formulated as
+the multi-label prediction of the five diagnostic superclasses NORM, MI, STTC, CD and HYP from the
+raw 12-lead signal.
+
+Deep learning has substantially changed automatic ECG analysis. Convolutional and recurrent
+networks have reached cardiologist-level performance on single-lead ambulatory recordings
+\cite{hannun2019} and on large 12-lead cohorts \cite{ribeiro2020}, and the public PTB-XL dataset
+\cite{wagner2020ptbxl} has enabled reproducible benchmarks in which ResNet, Inception and LSTM
+models reach macro areas under the ROC curve (AUROC) between 0.921 and 0.930 on the
+superdiagnostic task \cite{strodthoff2021}. Subsequent work has added self-supervised pretraining
+\cite{mehari2022ssl,na2024stmem}, state space models and patient metadata \cite{mehari2023s4}, and
+ECG--text multimodal learning \cite{li2023mets,liu2024merl}. Three gaps nevertheless remain.
+First, almost all of these models are trained on centrally pooled data, whereas in practice ECG
+archives are held by separate hospitals that cannot share patient records. Second, the federated
+learning (FL) methods that address this constraint \cite{rieke2020future,kairouz2021advances}, such as FedAvg \cite{mcmahan2017fedavg},
+FedProx \cite{li2020fedprox} and SCAFFOLD \cite{karimireddy2020scaffold}, average model parameters
+and therefore require every site to train the same architecture over many communication rounds.
+Third, the clinical use of such models requires explanations and an explicit statement of when the
+model should not decide on its own, which most ECG studies do not provide \cite{wagner2024xai}.
+
+\textit{Motivation and novelty.} This paper studies a setting in which several institutions each
+own a disjoint, patient-separated share of the training data and are free to choose their own
+network architecture. Instead of averaging parameters, each institution trains its model once,
+calibrates it, and contributes only its predicted class probabilities to a central gate, which
+combines them as $P(y\mid x)=\sum_i w_i P_i(y\mid x)$ with weights on the probability simplex. This
+one-shot, prediction-level form of federation needs a single communication step per query, places
+no constraint on the client architectures, and never moves raw ECGs or parameters between sites. The
+question addressed is deliberately conservative: whether the aggregated model is better than the
+best individual client, and how close it comes to a model trained on all data pooled together. The
+weighting scheme itself is selected on validation data with a rule that prefers the simplest
+combiner unless a more complex one is clearly better, and the final model is evaluated once on the
+held-out PTB-XL test fold over three random seeds.
+
+The major contributions of this work are as follows.
+\begin{enumerate}
+  \item \textbf{One-shot federated aggregation of heterogeneous clients:} Four clients train
+  structurally different networks (a 1D CNN, a 1D ResNet, a BiLSTM and a CNN-LSTM) on disjoint,
+  patient-level shares of PTB-XL, and only calibrated probabilities are exchanged, so no parameter
+  averaging and no common architecture are required.
+  \item \textbf{Calibrated simplex gate with parsimony-first selection:} Equal weights, learned
+  static weights and a per-patient dynamic gate are fitted on patient-grouped cross-validation
+  predictions, and a more complex combiner is adopted only if it improves the validation macro AUROC
+  by at least 0.002.
+  \item \textbf{Rigorous multi-seed evaluation against strong references:} Over three seeds the
+  selected gate reaches a test macro AUROC of 0.905 and improves on the best single client in every
+  seed (paired bootstrap), and it is compared with traditional classifiers on 172 hand-crafted
+  features and with FedAvg, FedProx, SCAFFOLD and FedNova on the same partitions, remaining within
+  0.002 AUROC of FedAvg with a single communication round.
+  \item \textbf{Client-level ablation and attribution:} All 15 client subsets are evaluated and
+  the contribution of each institution is quantified with Shapley values, showing why learned
+  weights that discard weaker clients lose to equal weighting.
+  \item \textbf{Explainability and safe automation:} Integrated Gradients attribute each superclass
+  prediction to leads and time, and per-finding rule-in/rule-out bands fitted on validation data
+  automate 53.7\% of findings with a precision of 0.937 and an accuracy of 0.967 while referring the
+  remaining findings to a cardiologist.
+\end{enumerate}
+
+The rest of this paper is organized as follows. Section~\ref{sec:related} reviews recent unimodal,
+multimodal, federated and explainable approaches to ECG and clinical classification.
+Section~\ref{sec:method} describes the proposed model, including preprocessing, the client
+networks, the federated aggregation and the explainability methods. Section~\ref{sec:results}
+presents the dataset, the experimental setup, the comparisons, the ablation experiments, the
+federated and class-wise analyses and the explainability results. Section~\ref{sec:conclusion}
+concludes the paper and outlines future work.

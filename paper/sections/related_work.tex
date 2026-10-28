@@ -1,0 +1,118 @@
+\section{Related Work}
+\label{sec:related}
+
+This section reviews peer-reviewed studies published between 2022 and 2026 that are closest to
+the present work. They are grouped into unimodal deep-learning approaches for the ECG, multimodal
+approaches, federated-learning approaches and explainable approaches. The reported figures are
+those stated by the respective authors on their own datasets and splits; they are therefore not
+directly comparable with each other, and the metric is named whenever it is not accuracy.
+Table~\ref{tab:related} summarises the review.
+
+\subsection{Unimodal ML/DL Approaches}
+Mehari and Strodthoff (2022) \cite{mehari2022ssl} proposed adapting contrastive predictive coding,
+SimCLR, BYOL and SwAV to 12-lead ECGs from PTB-XL and achieved a macro AUROC of 94.18\% on the
+71-statement task after self-supervised pretraining and fine-tuning, but the gain over supervised
+training was about one percentage point and the pretraining relied on pooling several large public
+corpora at one site. Na \textit{et al.} (2024) \cite{na2024stmem} proposed ST-MEM, a
+spatio-temporal masked auto-encoder, using PTB-XL for evaluation on the five diagnostic
+superclasses and achieved 82.5\% accuracy and a macro AUROC of 93.3\% after fine-tuning, but the
+method requires large-scale centralised pretraining and does not explain its decisions. Mehari and
+Strodthoff (2023) \cite{mehari2023s4} proposed structured state space (S4) models for the raw
+12-lead signal and achieved a macro AUROC of 94.17\% on the PTB-XL 71-statement task from the
+signal alone, but the model was trained on a single pooled dataset and its comparison with
+convolutional baselines was limited to centralised training. Together these studies establish
+strong single-site baselines, yet each assumes that all training records can be gathered in one
+place.
+
+\subsection{Multimodal Approaches}
+Mehari and Strodthoff (2023) \cite{mehari2023s4} also proposed fusing basic demographic metadata
+with the ECG representation of a pretrained S4 model on PTB-XL and achieved a macro AUROC of
+94.63\%, but the metadata improved the result by only 0.18 percentage points and the fusion was
+again centralised. Li \textit{et al.} (2023) \cite{li2023mets} proposed METS, which aligns ECG
+signals with automatically generated reports through a frozen language model, using PTB-XL and
+achieved 84.2\% zero-shot accuracy on the superclass task, but its macro F1 of 65.7\% remained below
+the 77.6\% of a supervised ResNet-18 reported in the same study. Liu \textit{et al.} (2024)
+\cite{liu2024merl} proposed MERL, an ECG--report multimodal pretraining method with test-time
+clinical-knowledge prompts, using MIMIC-ECG for pretraining and six public datasets for evaluation
+and achieved an average zero-shot AUROC of 75.2\%, but zero-shot performance stays well below
+supervised fine-tuning and the method needs paired free-text reports for every training ECG.
+Palakayala \textit{et al.} (2025) \cite{palakayala2025hamf} proposed HAMF, a hierarchical
+attention-based fusion of MRI, gait and speech for Parkinson's disease, using PPMI, PhysioNet and
+voice repositories and achieved 94.2\% accuracy, but the modalities were compiled from different
+cohorts rather than acquired from the same patients and the model was trained centrally. These
+studies show that additional modalities can help, but also that every modality must be available
+for each patient at one site.
+
+\subsection{Federated Learning Approaches}
+Raza \textit{et al.} (2022) \cite{raza2022fed} proposed a federated transfer-learning framework with
+a convolutional auto-encoder and an explanation module, using the MIT-BIH arrhythmia database and
+achieved 98.9\% accuracy on clean signals (94.5\% on noisy signals), but the evaluation used
+five-fold cross-validation on beats of a 48-record database rather than patient-level 12-lead
+diagnosis. Goto \textit{et al.} (2022) \cite{goto2022fed} proposed multinational FL for ECG and
+echocardiogram models across three hospitals in the United States and Japan and achieved AUROCs of
+90\%--96\% on internal test sets and 93\% on an external site for hypertrophic cardiomyopathy, but
+all sites trained the same architecture and the task was a single binary diagnosis. Quan
+\textit{et al.} (2025) \cite{quan2025fedocw} proposed FedOcw, which optimises client-specific
+aggregation weights in every round, using five multilingual speech corpora for Parkinson's disease
+and achieved 74.81\% accuracy in the Spanish--Italian scenario, outperforming FedAvg, FedProx,
+SCAFFOLD and FedNova, but the method still averages parameters of an identical network over 100
+rounds. Sathi \textit{et al.} (2025) \cite{sathi2025xfl} proposed explainable FL on ECG fiducial
+features with SHAP and LIME, using the MIT-BIH, European ST-T and Fantasia databases and achieved
+92.3\% accuracy, but the clients shared one model family and the reported accuracies vary between
+sections of the study. In all of these studies the clients are required to train the same model and
+to communicate repeatedly.
+
+\subsection{Explainable AI Approaches}
+Jahmunah \textit{et al.} (2022) \cite{jahmunah2022gradcam} proposed DenseNet and CNN models with
+Grad-CAM, using the PTB diagnostic database to separate healthy subjects from ten MI locations and
+achieved accuracies above 95\%, but the data came from a small cohort and the heat maps were assessed
+only qualitatively. Wagner \textit{et al.} (2024) \cite{wagner2024xai} proposed a set of building
+blocks for auditing ECG models, comparing local attributions with concept-based global analyses on
+PTB-XL, and reported that saliency was the only attribution method that passed all of their sanity
+checks, but the study focuses on the explanation methods and does not propose a new classifier.
+Pantelidis \textit{et al.} (2025) \cite{pantelidis2025xplaim} proposed ECG-XPLAIM, an inception-style
+1D CNN with Grad-CAM trained on MIMIC-IV and externally validated on PTB-XL, and achieved a macro
+AUROC of 98\% for conduction disturbances, but the model addresses selected arrhythmias and its
+sensitivity for long-QT detection was only 69.1\%. Explainability is increasingly expected, yet it
+is rarely combined with a privacy-preserving training scheme or with a mechanism that decides which
+predictions should be referred to a clinician.
+
+\begin{table*}[!t]
+\centering
+\caption{Summary of related work (reported figures are the authors' own; metric named when not accuracy)}
+\label{tab:related}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}p{0.6cm}p{2.4cm}p{3.1cm}p{3.6cm}p{2.0cm}p{4.8cm}@{}}
+\toprule
+Ref & Author \& Year & Dataset / Modality & Model / Method & Accuracy (\%) & Limitation \\
+\midrule
+\cite{mehari2022ssl} & Mehari \& Strodthoff, 2022 & PTB-XL; 12-lead ECG & CPC self-supervised pretraining + LSTM & 94.18 (macro AUROC) & Centralised pretraining on pooled corpora \\
+\cite{na2024stmem} & Na \textit{et al.}, 2024 & PTB-XL superclasses; ECG & ST-MEM masked auto-encoder & 82.5 (AUROC 93.3) & Large centralised pretraining; no explanations \\
+\cite{mehari2023s4} & Mehari \& Strodthoff, 2023 & PTB-XL; ECG (+ metadata) & S4 state space model & 94.17 / 94.63 (macro AUROC) & Single site; metadata adds 0.18 points \\
+\cite{li2023mets} & Li \textit{et al.}, 2023 & PTB-XL; ECG + report text & METS, frozen language model & 84.2 (zero-shot) & F1 65.7 below supervised ResNet-18 \\
+\cite{liu2024merl} & Liu \textit{et al.}, 2024 & MIMIC-ECG + 6 datasets; ECG + text & MERL multimodal pretraining & 75.2 (avg.\ zero-shot AUROC) & Needs paired reports; below fine-tuning \\
+\cite{palakayala2025hamf} & Palakayala \textit{et al.}, 2025 & PPMI, PhysioNet, voice; MRI, gait, speech & HAMF hierarchical attention fusion & 94.2 & Modalities from different cohorts; centralised \\
+\cite{raza2022fed} & Raza \textit{et al.}, 2022 & MIT-BIH; single-lead beats & Federated transfer learning + XAI & 98.9 (clean), 94.5 (noisy) & Beat-level task; same model on all clients \\
+\cite{goto2022fed} & Goto \textit{et al.}, 2022 & 4 hospitals; ECG, echo & Multinational FL & 90--96 (AUROC) & Binary task; homogeneous architectures \\
+\cite{quan2025fedocw} & Quan \textit{et al.}, 2025 & 5 speech corpora & FedOcw optimised client weights & 74.81 & 100 rounds of parameter averaging \\
+\cite{sathi2025xfl} & Sathi \textit{et al.}, 2025 & MIT-BIH, ST-T, Fantasia; fiducial features & Explainable FL with SHAP/LIME & 92.3 & Hand-crafted features; inconsistent reporting \\
+\cite{jahmunah2022gradcam} & Jahmunah \textit{et al.}, 2022 & PTB; 12-lead ECG & DenseNet/CNN + Grad-CAM & $>$95 & Small cohort; qualitative heat maps \\
+\cite{wagner2024xai} & Wagner \textit{et al.}, 2024 & PTB-XL; 12-lead ECG & Attribution sanity checks, concept analysis & -- (not reported) & Explanation study, no new classifier \\
+\cite{pantelidis2025xplaim} & Pantelidis \textit{et al.}, 2025 & MIMIC-IV $\rightarrow$ PTB-XL; ECG & ECG-XPLAIM 1D CNN + Grad-CAM & 98 (macro AUROC, CD) & Selected arrhythmias; LQT sensitivity 69.1 \\
+\midrule
+This work & -- & PTB-XL superclasses; 12-lead ECG & One-shot federated gate over 4 heterogeneous clients & 86.9 (label-wise); AUROC 90.5 & See Section~\ref{sec:discussion} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Research Gap}
+The reviewed studies reveal three gaps that motivate this work. Single-site ECG models achieve high
+AUROC but assume that all records can be pooled. Federated methods remove this assumption but
+average parameters, so every institution must adopt the same architecture and participate in many
+synchronised rounds. Explainable models, finally, are seldom combined with privacy-preserving
+training or with an explicit rule for deferring uncertain findings. The proposed model addresses
+these gaps by letting each institution train its own architecture once, combining only calibrated
+probabilities through a validated simplex gate, explaining the combined prediction with
+attributions on the raw signal, and reporting automatically only those findings for which the
+validated precision and recall reach the clinical target.

@@ -810,48 +810,60 @@ File: figures//server_convergence.pdf Graphic file (type pdf)
  [12] (tables/fedcomp)
 File: figures//fl_convergence.pdf Graphic file (type pdf)
 <use figures//fl_convergence.pdf>
-File: figures//confusion.pdf Graphic file (type pdf)
-<use figures//confusion.pdf>
+File: figures//confusion_combined.jpg Graphic file (type bmp)
+<figures//confusion_combined.jpg>
+File: figures//confusion_clients.jpg Graphic file (type bmp)
+<figures//confusion_clients.jpg>
 File: figures//roc.pdf Graphic file (type pdf)
 <use figures//roc.pdf>
- (tables/classwise)
-Underfull \hbox (badness 1960) in paragraph at lines 483--488
+ [13] (tables/classwise)
+Underfull \hbox (badness 1960) in paragraph at lines 498--503
 []\T1/ptm/m/n/10 NORM (F1 0.850) and STTC (0.768) are the best-
  []
 
-[13]
-Underfull \vbox (badness 6477) has occurred while \output is active []
-
-
-(sections/xai_results [14]
+(sections/xai_results
 File: figures//xai_leads.pdf Graphic file (type pdf)
 <use figures//xai_leads.pdf>
+ [14]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Underfull \vbox (badness 7326) has occurred while \output is active []
+
+ [15]
 File: figures//xai_local.pdf Graphic file (type pdf)
 <use figures//xai_local.pdf>
- (tables/xai_deletion))
-Underfull \hbox (badness 10000) in paragraph at lines 532--532
+
+(tables/xai_deletion))
+Underfull \hbox (badness 10000) in paragraph at lines 547--547
 []|\T1/ptm/m/n/8 XGBoost, 172 fea-tures
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 533--533
+Underfull \hbox (badness 10000) in paragraph at lines 548--548
 []|\T1/ptm/m/n/8 4 sites, 20
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 534--534
+Underfull \hbox (badness 10000) in paragraph at lines 549--549
 []|\T1/ptm/m/n/8 4 sites, 1
  []
 
-[15]
+[16]
+Underfull \vbox (badness 1412) has occurred while \output is active []
+
+)
+(sections/conclusion
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [16])
-(sections/conclusion) (main.bbl [17]) [18] (main.aux)
+ [17])
+(main.bbl [18]) [19
+
+] (main.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 9642FC548B1F2E4C5C59E56C23E9FDCE;6512.
  )
-Output written on main.xdv (18 pages, 217480 bytes).
+Output written on main.xdv (19 pages, 219280 bytes).

@@ -11,3 +11,9 @@ __pycache__/
 outputs/images/debug/
 .claude/settings.local.json
 outputs/tables/*_debug.csv
+paper/scripts/xai_attr_*.pt
+paper/onecolumn/
+
+# portal secrets (API keys)
+web/.env
+report/build/

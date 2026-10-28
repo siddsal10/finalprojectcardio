@@ -1,0 +1,26 @@
+\begin{tabular}{@{}llcccccc@{}}
+\toprule
+Model & Params & Acc. (\%) & Prec. (\%) & Rec. (\%) & F1 (\%) & AUROC & AUPRC \\
+\midrule
+\multicolumn{8}{@{}l}{\emph{Traditional machine learning (172 hand-crafted features, pooled folds 1--8)}}\\
+Logistic Regression & -- & 84.4 $\pm$ 0.0 & 65.3 $\pm$ 0.0 & 71.7 $\pm$ 0.0 & 68.2 $\pm$ 0.0 & 0.880 $\pm$ 0.000 & 0.724 $\pm$ 0.000 \\
+SVM (RBF) & -- & 85.8 $\pm$ 0.0 & 67.3 $\pm$ 0.0 & 74.5 $\pm$ 0.0 & 70.6 $\pm$ 0.0 & 0.898 $\pm$ 0.000 & 0.772 $\pm$ 0.000 \\
+Random Forest & -- & 86.2 $\pm$ 0.2 & 69.1 $\pm$ 0.8 & 74.0 $\pm$ 1.2 & 71.2 $\pm$ 0.2 & 0.902 $\pm$ 0.001 & 0.778 $\pm$ 0.001 \\
+KNN & -- & 82.2 $\pm$ 0.0 & 60.8 $\pm$ 0.0 & 68.9 $\pm$ 0.0 & 64.4 $\pm$ 0.0 & 0.859 $\pm$ 0.000 & 0.700 $\pm$ 0.000 \\
+XGBoost & -- & 86.8 $\pm$ 0.0 & 69.7 $\pm$ 0.2 & 76.3 $\pm$ 0.5 & 72.6 $\pm$ 0.2 & 0.909 $\pm$ 0.002 & 0.789 $\pm$ 0.003 \\
+\midrule
+\multicolumn{8}{@{}l}{\emph{Single deep clients (25\% of training data each)}}\\
+Client A: 1D CNN & 0.44M & 84.8 $\pm$ 0.2 & 64.6 $\pm$ 0.6 & 72.6 $\pm$ 0.8 & 68.0 $\pm$ 0.3 & 0.888 $\pm$ 0.002 & 0.738 $\pm$ 0.005 \\
+Client B: 1D ResNet & 6.73M & 84.0 $\pm$ 0.8 & 63.0 $\pm$ 1.3 & 73.4 $\pm$ 1.8 & 67.2 $\pm$ 0.4 & 0.882 $\pm$ 0.002 & 0.721 $\pm$ 0.005 \\
+Client C: BiLSTM & 0.67M & 85.5 $\pm$ 0.3 & 66.2 $\pm$ 1.2 & 73.3 $\pm$ 0.5 & 69.2 $\pm$ 0.3 & 0.894 $\pm$ 0.000 & 0.745 $\pm$ 0.003 \\
+Client D: CNN-LSTM & 0.47M & 85.7 $\pm$ 0.8 & 67.0 $\pm$ 2.8 & 72.2 $\pm$ 3.1 & 69.0 $\pm$ 0.1 & 0.896 $\pm$ 0.001 & 0.749 $\pm$ 0.006 \\
+\midrule
+\multicolumn{8}{@{}l}{\emph{Aggregation of the four clients}}\\
+Static learned weights & 4 & 86.6 $\pm$ 0.3 & 68.5 $\pm$ 0.9 & 72.8 $\pm$ 0.8 & 70.3 $\pm$ 0.3 & 0.903 $\pm$ 0.001 & 0.764 $\pm$ 0.004 \\
+Dynamic gate & $\approx$1k & 86.4 $\pm$ 0.3 & 68.1 $\pm$ 1.2 & 72.9 $\pm$ 1.3 & 70.2 $\pm$ 0.1 & 0.901 $\pm$ 0.001 & 0.759 $\pm$ 0.002 \\
+\textbf{Proposed (equal-weight gate)} & 8.31M & 86.9 $\pm$ 0.2 & 69.8 $\pm$ 0.9 & 72.5 $\pm$ 2.1 & 70.7 $\pm$ 0.6 & 0.905 $\pm$ 0.000 & 0.767 $\pm$ 0.002 \\
+\midrule
+\multicolumn{8}{@{}l}{\emph{Centralised reference (data pooled, not federated)}}\\
+CNN-LSTM on folds 1--8 & 0.47M & 86.4 $\pm$ 0.7 & 68.5 $\pm$ 1.2 & 74.0 $\pm$ 0.6 & 70.7 $\pm$ 0.8 & 0.909 $\pm$ 0.001 & 0.774 $\pm$ 0.002 \\
+\bottomrule
+\end{tabular}

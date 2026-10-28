@@ -183,17 +183,18 @@ SEQUENCE = r"""
 """
 
 PLAN = r"""
-\begin{tikzpicture}[x=0.62cm, y=0.62cm, bar/.style={fill=blue!45, draw=blue!70!black}]
-\def\tasks{{"Data download and verification","Earlier 3-modality prototype (Phases 0-3)","Redesign: four-client system","Training A-D, 3 seeds; aggregation","Baselines, leave-one-client-out","Per-finding triage","CardioSentinel web portal","Paper, XAI, ML and FL baselines","Photo/scan ECG reading, assistant","Report and single-column paper"}}
-\foreach \d [count=\i from 0] in {7,8,...,27} {
-  \node[font=\scriptsize] at (\i+0.5, 0.7) {\d};
-  \draw[gray!30] (\i,0.3) -- (\i,-10);
+\begin{tikzpicture}[x=0.105cm, y=0.62cm, bar/.style={fill=blue!45, draw=blue!70!black}]
+\def\tasks{{"Literature review","Data download and pre-processing","Earlier 3-modality prototype","Redesign: four-client system","Training A-D, 3 seeds; aggregation","Baselines and per-finding triage","Portal, photo reading, XAI","Paper and report"}}
+\foreach \x/\m in {0/July, 31/August, 62/September, 92/October} {
+  \node[font=\scriptsize, anchor=west] at (\x+1, 0.7) {\m};
+  \draw[gray!40] (\x,0.3) -- (\x,-8);
 }
-\draw[gray!30] (21,0.3) -- (21,-10);
-\node[font=\small\bfseries, anchor=east] at (-0.3,0.7) {October 2026};
-\foreach \s/\e [count=\r from 0] in {0/1, 0/8, 8/9, 8/12, 11/12, 12/13, 12/13, 14/16, 19/21, 20/21} {
+\draw[gray!40] (105,0.3) -- (105,-8);
+\node[font=\scriptsize, anchor=east] at (105, 0.7) {13};
+\node[font=\small\bfseries, anchor=east] at (-3,0.7) {2026};
+\foreach \s/\e [count=\r from 0] in {0/15, 15/31, 31/51, 51/62, 62/82, 82/92, 92/99, 99/105} {
   \pgfmathsetmacro{\name}{\tasks[\r]}
-  \node[font=\footnotesize, anchor=east] at (-0.3,-\r-0.5) {\name};
+  \node[font=\footnotesize, anchor=east] at (-3,-\r-0.5) {\name};
   \draw[bar] (\s,-\r-0.85) rectangle (\e,-\r-0.15);
 }
 \end{tikzpicture}
