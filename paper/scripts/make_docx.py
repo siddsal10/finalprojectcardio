@@ -126,8 +126,12 @@ def convert_floats(tex: str, labels: dict[str, str], preamble: str) -> str:
                 render_png(body, preamble, png)
             else:
                 name = re.search(r"\\includegraphics(\[[^\]]*\])?\{([^}]*)\}", body).group(2)
-                png = WORK / f"{name}.png"
-                pdf_to_png(PAPER / "figures" / f"{name}.pdf", png)
+                if Path(name).suffix:                    # already an image (e.g. confusion_combined.jpg)
+                    png = WORK / name
+                    shutil.copy(PAPER / "figures" / name, png)
+                else:
+                    png = WORK / f"{name}.png"
+                    pdf_to_png(PAPER / "figures" / f"{name}.pdf", png)
             width = "6.3in" if wide else "4.4in"
             out.append(f"\\begin{{figure}}\\centering\\includegraphics[width={width}]{{{png.name}}}"
                        f"\\caption{{Fig. {num}. {caption}}}\\end{{figure}}")

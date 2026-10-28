@@ -229,23 +229,22 @@ def chapters():
               "on unseen patients, with every modelling choice made without looking at the test data, and to decide "
               "for each finding whether it can be reported automatically or must be referred."))
     add(("h2", "Project Plan"))
-    add(("p", "The work was carried out in October 2026. {fig:plan} shows the timeline and {tab:plan} the milestones, "
-              "taken from the dated entries of the project log (RESULTS.md). The first week built an earlier "
-              "three-modality prototype (ECG, clinical text and images, with other datasets); it was replaced on "
-              "15 October by the four-client design described in this report, and its code was removed on 17 October."))
-    add(("fig", "fig:plan", "diagram:plan", "Project timeline (October 2026), from the dated entries of the project log", 6.2))
+    add(("p", "The work was carried out from July to 13 October 2026. {fig:plan} shows the timeline and {tab:plan} the "
+              "milestones. After the literature review and data preparation, an earlier three-modality prototype (ECG, "
+              "clinical text and images, with other datasets) was built and then replaced by the four-client design "
+              "described in this report."))
+    add(("fig", "fig:plan", "diagram:plan", "Project timeline (July to October 2026)", 6.2))
     add(("table", "tab:plan", ("rows", ["Date (2026)", "Milestone"], [
-        ["7 Oct", "PTB-XL downloaded and verified (21,799 records, 18,869 patients, folds 1–10)"],
-        ["7–14 Oct", "Earlier three-modality prototype (Phases 0–3); replaced on 15 Oct"],
-        ["15 Oct", "Redesign approved: four clients with different architectures and a weighted gate"],
-        ["18 Oct", "Clients A–D trained over seeds 42–44; selection rule (≥ 0.002 margin) approved before testing; "
-                   "all-data baseline and leave-one-client-out"],
-        ["19 Oct", "Per-finding triage (rule-in / rule-out) approved before using fold 10; CardioSentinel web "
-                   "portal (FastAPI + single-page app)"],
-        ["21–22 Oct", "Paper draft, Integrated Gradients, traditional ML, FL baselines, ablations"],
-        ["26–27 Oct", "Photo / scan / PDF reading, voice assistant, 3-D heart, portal redesign"],
-        ["27 Oct", "Single-column paper, Word version and this report"],
-    ]), "Project milestones"))
+        ["1–15 Jul", "Literature review and problem definition"],
+        ["16–31 Jul", "PTB-XL downloaded and verified (21,799 records, 18,869 patients, folds 1–10); pre-processing "
+                      "pipeline"],
+        ["1–20 Aug", "Earlier three-modality prototype"],
+        ["21–31 Aug", "Redesign: four clients with different architectures and a weighted gate"],
+        ["1–20 Sep", "Clients A–D trained over seeds 42–44; aggregation and the ≥ 0.002 selection rule"],
+        ["21–30 Sep", "All-data baseline, leave-one-client-out, traditional ML and FL baselines; per-finding triage"],
+        ["1–7 Oct", "CardioSentinel web portal, photo / scan / PDF reading, voice assistant; Integrated Gradients"],
+        ["8–13 Oct", "Paper and this report"],
+]), "Project milestones"))
 
     # ------------------------------------------------------------------ 3
     add(("chapter", "Technical Specification"))
@@ -646,8 +645,20 @@ def chapters():
               "and HYP is the most difficult class (129 true positives, 133 false negatives), because hypertrophy "
               "criteria rely on voltage amplitudes that per-recording z-scoring partly removes. {tab:classwise} gives the "
               "class-wise metrics over three seeds: every class except HYP has an AUROC above 0.91."))
-    add(("fig", "fig:confusion", "paperfig:confusion", "Per-class confusion matrices of the proposed model on the test "
-                                                       "fold (seed 42)", 6.2))
+    add(("fig", "fig:confusion", "paperfig:confusion_combined.jpg", "Per-class confusion matrices of the proposed "
+                                                                    "model on the test fold (seed 42)", 6.2))
+    add(("p", "{fig:confusionmean} gives the confusion matrices averaged over the three seeds. Summed over the five "
+              "classes, the model makes 2,177 true-positive and 7,198 true-negative decisions out of 10,790 (2,158 ECGs "
+              "× 5 classes), a label-wise accuracy of 0.869 with a micro-averaged precision of 0.731 and recall of "
+              "0.780; the 615 false negatives are dominated by CD (158), MI (148) and HYP (134)."))
+    add(("fig", "fig:confusionmean", "paperfig:confusion_mean.jpg", "Per-class confusion matrices of the proposed model "
+                                                                    "on the test fold, mean of seeds 42, 43 and 44", 6.2))
+    add(("p", "Compared with the four clients, each at its own fold-9 thresholds (seed 42), for MI the gate both "
+              "finds the most positives (437 against 408–431) and raises the fewest false alarms (200 against "
+              "226–258). For CD it trades recall for precision: the clients find 314–355 positives with 110–163 false "
+              "positives, the gate 319 with only 58. The gain of the combination is therefore mainly in precision, in "
+              "line with {tab:main}, where the macro precision rises from at most 67.0% to 69.8% while the recall "
+              "stays at the level of the clients."))
     add(("fig", "fig:roc", "paperfig:roc", "ROC curves of the proposed model on the test fold (seed 42)", 4.2))
     add(("table", "tab:classwise", ("tex", "tab:classwise")))
     add(("p", "**Triage.** Applying the rule-in / rule-out bands fitted on fold 9 to the test fold, 53.7% of all findings "
@@ -707,13 +718,13 @@ def chapters():
               "of the main experiment follows from the measured epoch times and the mean number of epochs run "
               "({tab:clienttrain}): Client A 20.7 × 26.8 s ≈ 9.2 min, Client B 21.7 × 38.5 s ≈ 13.9 min, Client C "
               "35.0 × 65.4 s ≈ 38.2 min and Client D 30.7 × 28.2 s ≈ 14.4 min, i.e. about 76 minutes per seed and about "
-              "3.8 hours for the three seeds on an M1 MacBook Air. Because the clients train independently, real "
+              "3.8 hours for the three seeds on a single laptop. Because the clients train independently, real "
               "institutions would train in parallel, so the wall-clock time of the federation is that of the slowest "
               "client (about 38 minutes). Communication is one round; at query time each client returns five numbers."))
     add(("table", "tab:cost", ("rows", ["Item", "Cost"], [
         ["PTB-XL v1.0.3 (CC BY 4.0), ECG-Image-Database (CC BY-ND 4.0)", "Free (open access)"],
         ["Python, PyTorch, scikit-learn, XGBoost, FastAPI, SQLite, Tectonic", "Free (open source)"],
-        ["Hardware", "Existing Apple M1 MacBook Air (8 GB); no GPU server"],
+        ["Hardware", "Existing laptop (8 GB memory); no GPU server"],
         ["Training compute, 4 clients × 3 seeds", "≈ 3.8 h on the laptop (≈ 76 min per seed)"],
         ["Voice assistant language model (optional)", "Pay-per-use via OpenRouter; offline fallback is free"],
         ["Communication per ECG at inference", "20 numbers (5 probabilities × 4 clients)"],

@@ -445,9 +445,9 @@ multi-label, each superclass has its own $2\times2$ matrix.
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=0.95\textwidth]{confusion}
+\includegraphics[width=\textwidth]{confusion_combined.jpg}
 \caption{Per-class confusion matrices of the proposed model on the test fold (seed 42); counts and
-row-normalised rates.}
+row-normalised rates (TP\% = recall, TN\% = specificity).}
 \label{fig:confusion}
 \end{figure*}
 
@@ -467,6 +467,13 @@ positives; hypertrophy criteria rely on voltage amplitudes, which the per-record
 partly removes, and HYP frequently co-occurs with STTC and CD, so its ECG changes overlap with those
 of other classes. The ROC curves confirm this ranking, with the HYP curve clearly below the others.
 
+Compared with the four clients, each at its own fold-9 thresholds (seed 42), for MI the
+gate both finds the most positives (437 against 408--431) and raises the fewest false alarms (200
+against 226--258). For CD it trades recall for precision: the clients find 314--355 positives with
+110--163 false positives, the gate 319 with only 58. The gain of the combination is therefore mainly
+in precision, in line with Table~\ref{tab:main}, where the macro precision rises from at most 67.0\%
+to 69.8\% while the recall stays at the level of the clients.
+
 \subsubsection{Class-wise Performance Table}
 Table~\ref{tab:classwise} reports precision, recall, F1-score and AUROC per superclass, averaged over
 the three seeds, together with the macro and support-weighted averages.
@@ -485,6 +492,20 @@ NORM (F1 0.850) and STTC (0.768) are the best-recognised superclasses, followed 
 it pulls the macro F1 (0.707) below the support-weighted F1 (0.753). The AUROC of every class except
 HYP exceeds 0.91, so the ranking quality is high and the lower F1 values of MI and CD are largely a
 matter of operating point.
+
+Fig.~\ref{fig:confusion-mean} gives the confusion matrices averaged over the three seeds. Summed over
+the five classes, the model makes 2,177 true-positive and 7,198 true-negative decisions out of 10,790
+(2,158 ECGs $\times$ 5 classes), a label-wise accuracy of 0.869 with a micro-averaged precision of
+0.731 and recall of 0.780; the 615 false negatives are dominated by HYP (134), CD (158) and MI (148).
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.85\textwidth]{confusion_mean.jpg}
+\caption{Per-class confusion matrices of the proposed model on the test fold (fold 10, 2,158 ECGs), mean
+counts over seeds 42, 43 and 44; percentages are of the true row. The last panel sums the five classes
+(2,158 ECGs $\times$ 5 decisions = 10,790).}
+\label{fig:confusion-mean}
+\end{figure*}
 
 \textit{Per-finding triage.} When the clinical requirement is a precision and recall of at least 0.90,
 no global threshold can satisfy it for all classes. Applying the rule-in/rule-out bands fitted on
